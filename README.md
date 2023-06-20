@@ -24,6 +24,9 @@ the nearest-neighbor technique.
   - in terminal, type `brew install gtk+3`
   - gtk 3.x and all its dependencies should automatically install
 
+- PkgConfig
+  - 
+
 ## Program
 - to run program, navigate to project directory and type
   ```
