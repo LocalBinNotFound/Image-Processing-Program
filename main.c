@@ -8,7 +8,6 @@
 #include "stb/stb_image_write.h"
 #include "image_functions.h"
 
-// test comment
 void openButtonClicked(GtkWidget *button, gpointer user_data) {
     GtkWidget *dialog;
     GtkFileChooserAction action = GTK_FILE_CHOOSER_ACTION_OPEN;
