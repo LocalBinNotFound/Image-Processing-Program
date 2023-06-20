@@ -10,3 +10,6 @@ or subtracting a constant value from each pixel's RGB components.
 reduce detail.
 3. Rotate an image by a specified angle using interpolation techniques such as
 nearest-neighbor technique.
+
+libraries used: stb
+GUI used: GTK3
