@@ -9,6 +9,6 @@ pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 link_directories(${GTK3_LIBRARY_DIRS})
 include_directories(${GTK3_INCLUDE_DIRS})
 
-add_executable(Image_Processing_Program main.c imageFunctions.c imageFunctions.h)
+add_executable(Image_Processing_Program main.c image_functions.c image_functions.h)
 
 target_link_libraries(Image_Processing_Program ${GTK3_LIBRARIES})

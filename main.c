@@ -6,7 +6,7 @@
 #include <gtk/gtk.h>
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
-#include "imageFunctions.h"
+#include "image_functions.h"
 
 void openButtonClicked(GtkWidget *button, gpointer user_data) {
     GtkWidget *dialog;
@@ -19,6 +19,8 @@ void openButtonClicked(GtkWidget *button, gpointer user_data) {
                                          "_Cancel",
                                          GTK_RESPONSE_CANCEL,
                                          "_Open",
+                                         GTK_RESPONSE_ACCEPT,
+                                         "_Select",
                                          GTK_RESPONSE_ACCEPT,
                                          NULL);
 
