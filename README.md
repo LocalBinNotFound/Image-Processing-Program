@@ -25,7 +25,7 @@ the nearest-neighbor technique.
   - gtk 3.x and all its dependencies should automatically install
 
 - PkgConfig
-  - 
+  - in terminal, type `brew install pkg-config`
 
 ## Program
 - to run program, navigate to project directory and type
