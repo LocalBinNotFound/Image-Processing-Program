@@ -9,7 +9,9 @@ or subtracting a constant value from each pixel's RGB components.
 2. Gaussian Blur: Blur an image using a Gaussian filter to smooth out noise and
 reduce detail.
 3. Rotate an image by a specified angle using interpolation techniques such as
-nearest-neighbor technique.
+the nearest-neighbor technique.
 
-libraries used: stb
+libraries used: stb (included in the source code)
+
 GUI used: GTK3
+in terminal, type 'brew install gtk+3'
