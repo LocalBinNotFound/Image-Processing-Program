@@ -1,5 +1,6 @@
 # Image Processing Program
 
+## Details
 Create a program that can read in an image file, do several manipulations on the pixels of
 the image, and then write the modified image to a new file. This project will involve
 learning about image file formats, working with arrays, file I/O in C and implementing
@@ -10,8 +11,20 @@ or subtracting a constant value from each pixel's RGB components.
 reduce detail.
 3. Rotate an image by a specified angle using interpolation techniques such as
 the nearest-neighbor technique.
+4. ...
 
-libraries used: stb (included in the source code)
+## Libraries and Tools
+### Libraries:
+- stb image encoder and decoder
 
-GUI used: GTK3
-in terminal, type `brew install gtk+3`
+### Tools:
+- GTK3
+  - in terminal, type `brew install gtk+3`
+  - gtk 3.x and all its dependencies should automatically install
+
+## Program
+- to run program, navigate to project directory and type
+  ```
+  gcc main.c image_functions.c -o Image_Processing `pkg-config --cflags --libs gtk+-3.0`
+  sudo ./Image_Processing
+  ```
