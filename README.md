@@ -14,4 +14,7 @@ the nearest-neighbor technique.
 libraries used: stb (included in the source code)
 
 GUI used: GTK3
-in terminal, type """brew install gtk+3"""
+in terminal, type 
+'''
+brew install gtk+3
+'''
