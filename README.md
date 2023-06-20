@@ -16,9 +16,11 @@ the nearest-neighbor technique.
 ## Libraries and Tools
 ### Libraries:
 - stb image encoder and decoder
+  - stb documentation https://nothings.org/stb/stb_h.html
 
 ### Tools:
 - GTK3
+  - GTK 3.0 documentation https://docs.gtk.org/gtk3/index.html
   - in terminal, type `brew install gtk+3`
   - gtk 3.x and all its dependencies should automatically install
 
