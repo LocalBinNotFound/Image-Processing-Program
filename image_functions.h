@@ -12,4 +12,4 @@ void invertColor(guchar *pixels, int width, int height) {}
 void grayscale() {}
 void mirrorImage() {}
 
-#endif IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
+#endif //IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
