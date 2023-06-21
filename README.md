@@ -3,12 +3,12 @@
 This program is a simple program written in C that can read, modify, and write an image file of mainstream formats
 (JPEG, PNG, BMP, HDR, PSD, TGA, GIF, PIC, PSD, PGM, PPM, ...). It has the following features and functions (more to be added as
 development progresses):
-1. A GUI: A simple graphical user interface created using GTK to load/modify/save images and navigate in the program
+1. A GUI: A simple graphical user interface created using GTK to load/preview/modify/save images and navigate in the program
 2. Brightness Adjustment: Increase or decrease the brightness of an image by adding
 or subtracting a constant value from each pixel's RGB components.
-3. Gaussian Blur(Soften): Blur an image using a Gaussian filter to smooth out noise and
+3. Gaussian Blur (Soften): Blur an image using a Gaussian filter to smooth out noise and
 reduce detail.
-4. Laplacian Sharpen(Sharpen): Sharpen an image using USM filter to sharpen details and edges.
+4. Laplacian Sharpen (Sharpen): Sharpen an image using Laplacian filter to sharpen details and edges.
 5. Rotate Image: Rotate an image by a specified angle using interpolation techniques such as
 the nearest-neighbor technique.
 6. Invert Color: Invert the RGB color of the image.
@@ -26,8 +26,7 @@ the nearest-neighbor technique.
 - GTK (GIMP Toolkit) -- toolkit for creating graphical user interface (GUI)
   - GTK 3.24.38 is deprecated but is the latest old stable GTK for GUI creation -
     see: https://github.com/GNOME/gtk/releases/tag/3.24.28
-  - GTK 4.x is not necessary for this project, but is latest and still in development - 
-    see: https://github.com/GNOME/gtk
+  - GTK 4.x is not necessary for this project - see: https://github.com/GNOME/gtk
   - GTK-3.0 documentation https://docs.gtk.org/gtk3/index.html
   - to install GTK 3.24.28, in terminal (assume homebrew has already been installed), type `brew install gtk+3`
     - verify installation is successful using `brew info gtk+3`
