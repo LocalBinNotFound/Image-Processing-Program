@@ -1,20 +1,29 @@
-void invertColor(unsigned char *image, int width, int height) {
-    for (int i = 0; i < width * height; i++) {
-        unsigned char *pixel = image + (i * 4);
-        pixel[0] = 255 - pixel[0]; // Red
-        pixel[1] = 255 - pixel[1]; // Green
-        pixel[2] = 255 - pixel[2]; // Blue
-    }
-}
+#include <gtk/gtk.h>
 
-void increaseBrightness() {
-
-}
-
-void decreaseBrightness() {
+void adjustBrightness() {
 
 }
 
 void gaussianBlur() {
+
+}
+
+void laplacianSharpen() {
+
+}
+
+void rotateImage() {
+
+}
+
+void invertColor(guchar *pixels, int width, int height) {
+
+}
+
+void grayscale() {
+
+}
+
+void mirrorImage() {
 
 }
