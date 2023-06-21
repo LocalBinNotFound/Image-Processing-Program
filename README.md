@@ -24,7 +24,7 @@ the nearest-neighbor technique.
 
 
 - GTK (GIMP Toolkit) -- toolkit for creating graphical user interface (GUI)
-  - GTK 3.24.38 is deprecated but is the latest old stable GTK for GUI creation -
+  - GTK 3.24.28 is deprecated but is the latest old stable GTK for GUI creation -
     see: https://github.com/GNOME/gtk/releases/tag/3.24.28
   - GTK 4.x is not necessary for this project - see: https://github.com/GNOME/gtk
   - GTK-3.0 documentation https://docs.gtk.org/gtk3/index.html
