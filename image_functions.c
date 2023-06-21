@@ -18,7 +18,7 @@ void rotateImage() {
 
 }
 
-void invertColor(guchar *pixels, int width, int height) {
+void invertColor() {
 
 }
 
