@@ -3,7 +3,7 @@
 #include "stb/stb_image_write.h"
 
 void adjustBrightness() {
-
+    int a = 1;
 }
 
 void gaussianBlur() {
