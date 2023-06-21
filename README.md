@@ -1,4 +1,4 @@
-# Image test
+# Image Wicked
 ## Description
 This program is a simple program written in C that can read, modify, and write an image file of mainstream formats
 (JPEG, PNG, BMP, HDR, PSD, TGA, GIF, PIC, PSD, PGM, PPM, ...). It has the following features and functions (more to be added as
