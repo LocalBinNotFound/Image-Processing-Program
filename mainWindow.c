@@ -1,5 +1,5 @@
 #include <gtk/gtk.h>
-#include "UI.h"
+#include "buttonActions.h"
 
 GtkWidget* scaleBothSides(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
