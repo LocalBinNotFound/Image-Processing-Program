@@ -1,15 +1,15 @@
 #include <gtk/gtk.h>
 #include "buttonActions.h"
 
-GtkWidget* scaleBothSides(GtkOrientation orientation, const gchar* title) {
+GtkWidget* scaleBar(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
-    GtkWidget* scale = gtk_scale_new_with_range(orientation, -100.0, 100.0, 1.0);
+    GtkWidget* scale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(scale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(scale), TRUE);
     gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_BOTTOM);
     gtk_widget_set_size_request(scale, 200, -1);
-    gtk_range_set_value(GTK_RANGE(scale), 0.0);
+    gtk_range_set_value(GTK_RANGE(scale), 50.0);
 
     gtk_box_pack_start(GTK_BOX(box), titleLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), scale, TRUE, TRUE, 0);
@@ -17,7 +17,7 @@ GtkWidget* scaleBothSides(GtkOrientation orientation, const gchar* title) {
     return box;
 }
 
-GtkWidget* scalesRGB(GtkOrientation orientation, const gchar* title) {
+GtkWidget* tripleScaleBar(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
     GtkWidget* rScale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
@@ -45,93 +45,107 @@ GtkWidget* scalesRGB(GtkOrientation orientation, const gchar* title) {
 }
 
 GtkWidget* boxWithBorder(GtkWidget* content) {
-    GtkWidget* framedBox = gtk_frame_new(NULL);
-    GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_container_add(GTK_CONTAINER(framedBox), box);
-    gtk_box_pack_start(GTK_BOX(box), content, TRUE, TRUE, 10);
-    gtk_container_set_border_width(GTK_CONTAINER(framedBox), 10);
+    GtkWidget* framedBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget* frame = gtk_frame_new(NULL);
+    gtk_container_add(GTK_CONTAINER(frame), content);
+    gtk_container_set_border_width(GTK_CONTAINER(frame), 10);
+    gtk_box_pack_start(GTK_BOX(framedBox), frame, TRUE, TRUE, 0);
     return framedBox;
 }
 
 
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
-    GtkWidget *mainWindow;
 
-    GtkWidget *overallBox;
-    // bottom box
-    GtkWidget *openButton;
-    GtkWidget *saveButton;
-    GtkWidget *exitButton;
-    GtkWidget *mainButtonsBox;
-    // top box
-    GtkWidget *functionsAndPreviewBox;
-    GtkWidget *leftFunctionBox;
-    GtkWidget *brightnessBox;
-    GtkWidget *softenBox;
-    GtkWidget *sharpenBox;
-    GtkWidget *rightFunctionBox;
-    GtkWidget *contrastBox;
-    GtkWidget *grayscaleBox;
-    GtkWidget *RGBBox;
-    GtkWidget *previewBox = gtk_event_box_new();
-
-    //initialize main window
-    mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    // Initialize main window
+    GtkWidget *mainWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_keep_above(GTK_WINDOW(mainWindow), TRUE);
     gtk_window_set_title(GTK_WINDOW(mainWindow), "Image Wicked!");
     gtk_window_set_position(GTK_WINDOW(mainWindow), GTK_WIN_POS_CENTER);
     gtk_window_set_resizable(GTK_WINDOW(mainWindow), FALSE);
     gtk_container_set_border_width(GTK_CONTAINER(mainWindow), 10);
 
-    // initialize boxes
-    overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    leftFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    rightFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget *previewBoxWithBorder = boxWithBorder(previewBox);
+    // Create boxes
+    GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *leftFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *rightFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *previewBox = gtk_event_box_new();
+    GtkWidget *brightnessBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Brightness"));
+    GtkWidget *softenBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Blur"));
+    GtkWidget *sharpenBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Sharpen"));
+    GtkWidget *contrastBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Contrast"));
+    GtkWidget *grayscaleBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Grayscale"));
+    GtkWidget *RGBBox = boxWithBorder(tripleScaleBar(GTK_ORIENTATION_HORIZONTAL, "RGB"));
+    GtkWidget *rotateBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    GtkWidget *rotateButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+
+    // Initialize buttons
+    GtkWidget *openButton = gtk_button_new_with_label("Open");
+    GtkWidget *saveButton = gtk_button_new_with_label("Save");
+    GtkWidget *exitButton = gtk_button_new_with_label("Exit");
+    GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
+    GtkWidget *rotateLeftButton = gtk_button_new_with_label("L");
+    GtkWidget *rotateRightButton = gtk_button_new_with_label("R");
+    GtkWidget *mirrorUpDownButton = gtk_button_new_with_label("UP/DOWN");
+    GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("LEFT/RIGHT");
+
+    // Set properties for previewBox
     gtk_widget_set_size_request(previewBox, 360, 640);
+    GtkWidget *previewBoxWithBorder = boxWithBorder(previewBox);
 
-    brightnessBox = boxWithBorder(scaleBothSides(GTK_ORIENTATION_HORIZONTAL, "Brightness"));
-    softenBox = boxWithBorder(scaleBothSides(GTK_ORIENTATION_HORIZONTAL, "Blur"));
-    sharpenBox = boxWithBorder(scaleBothSides(GTK_ORIENTATION_HORIZONTAL, "Sharpen"));
-    contrastBox = boxWithBorder(scaleBothSides(GTK_ORIENTATION_HORIZONTAL, "Contrast"));
-    grayscaleBox = boxWithBorder(scaleBothSides(GTK_ORIENTATION_HORIZONTAL, "Grayscale"));
-    RGBBox = boxWithBorder(scalesRGB(GTK_ORIENTATION_HORIZONTAL, "RGB"));
+    // Create labels and entry box
+    GtkWidget *rotateLabel = gtk_label_new("Rotation by Degree");
+    GtkWidget *rotateAngleTxtBox = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(rotateAngleTxtBox), "Enter rotation degree here");
+    GtkWidget *mirrorLabel = gtk_label_new("Mirror Image");
 
-    // assign boxes
+    // Assign boxes
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), brightnessBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), contrastBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), contrastBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), grayscaleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), RGBBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), grayscaleBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), RGBBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), rotateBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), mirrorBox, FALSE, FALSE, 0);
+
+    gtk_box_pack_start(GTK_BOX(rotateBox), rotateLabel, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rotateBox), rotateAngleTxtBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rotateBox), rotateButtonBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateLeftButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateRightButton, FALSE, FALSE, 0);
+
+    gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorLabel, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorButtonBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorUpDownButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
+
     gtk_box_pack_start(GTK_BOX(overallBox), functionsAndPreviewBox, FALSE, FALSE, 0);
-    gtk_box_set_homogeneous(GTK_BOX(leftFunctionBox), TRUE);
-    gtk_box_set_homogeneous(GTK_BOX(rightFunctionBox), TRUE);
 
-    // assign buttons
-    openButton = gtk_button_new_with_label("Open");
-    saveButton = gtk_button_new_with_label("Save");
-    exitButton = gtk_button_new_with_label("Exit");
-    mainButtonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_set_homogeneous(GTK_BOX(rightFunctionBox),TRUE);
+    // Assign buttons
+    GtkWidget *mainButtonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(mainButtonsBox), GTK_BUTTONBOX_SPREAD);
-
     gtk_box_pack_start(GTK_BOX(overallBox), mainButtonsBox, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), openButton);
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), saveButton);
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), exitButton);
 
+    // Connect signals
     g_signal_connect(openButton, "clicked", G_CALLBACK(openButtonClicked), previewBox);
     g_signal_connect(saveButton, "clicked", G_CALLBACK(saveButtonClicked), NULL);
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
+    // Add all widgets to the main window
     gtk_container_add(GTK_CONTAINER(mainWindow), overallBox);
-
     gtk_widget_show_all(mainWindow);
 
     gtk_main();
