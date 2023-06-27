@@ -21,9 +21,9 @@ GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
 GtkWidget* tripleScaleBarBox(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
-    GtkWidget* rScale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
-    GtkWidget* gScale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
-    GtkWidget* bScale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
+    GtkWidget* rScale = gtk_scale_new_with_range(orientation, 0.0, 255.0, 1.0);
+    GtkWidget* gScale = gtk_scale_new_with_range(orientation, 0.0, 255.0, 1.0);
+    GtkWidget* bScale = gtk_scale_new_with_range(orientation, 0.0, 255.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(rScale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(rScale), TRUE);
     gtk_scale_set_value_pos(GTK_SCALE(rScale), GTK_POS_BOTTOM);
@@ -67,7 +67,8 @@ int main(int argc, char *argv[]) {
 
     // Create boxes
     GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget *image = gtk_image_new_from_file("/Users/junjiefang/Desktop/NEU/CS5008/Image_Wicked/wicked.jpeg");
+    gchar *currentFolder = g_path_get_dirname(__FILE__);
+    GtkWidget *image = gtk_image_new_from_file(g_build_filename(currentFolder, "wicked.jpeg", NULL));
     GtkWidget *imageBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("LEFT/RIGHT");
 
     // Set properties for previewBox
-    gtk_widget_set_size_request(previewBox, 360, 640);
+    gtk_widget_set_size_request(previewBox, 270, 480);
     GtkWidget *previewBoxWithBorder = boxWithBorder(previewBox);
 
     // Create labels and entry box
@@ -109,11 +110,11 @@ int main(int argc, char *argv[]) {
                                            "\tJunjie Fang - LocalBinNotFound\n"
                                            "\tWeijian Huang - learningmachine999\n"
                                            "\tQirui Yang - Antonyyqr\n"
-                                           "\tXiyuan Tu - XiyuanTu\n");
+                                           "\tXiyuan Tu - XiyuanTu");
+
     gtk_box_pack_start(GTK_BOX(creditsBox), creditText, FALSE, FALSE, 0);
     // Assign boxes
-    gtk_box_pack_start(GTK_BOX(imageBox), image, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(imageBox), creditsBox, FALSE, FALSE, 0);
+    gtk_box_set_center_widget(GTK_BOX(imageBox), image);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
@@ -139,8 +140,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(overallBox), imageBox, FALSE, FALSE ,0);
     gtk_box_pack_start(GTK_BOX(overallBox), functionsAndPreviewBox, FALSE, FALSE, 0);
-    gtk_box_set_homogeneous(GTK_BOX(leftFunctionBox), TRUE);
-    gtk_box_set_homogeneous(GTK_BOX(rightFunctionBox),TRUE);
+    gtk_box_set_spacing(GTK_BOX(leftFunctionBox), 50);
+    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),50);
     // Assign buttons
     GtkWidget *mainButtonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(mainButtonsBox), GTK_BUTTONBOX_SPREAD);
