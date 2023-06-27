@@ -2,6 +2,12 @@
 #include "buttonActions.h"
 #include "image_functions.h"
 
+typedef struct previewBoxWithImage {
+    GtkWidget *previewBox;
+    GtkWidget *imageWidget;
+    GdkPixbuf *pixbuf;
+} PreviewBoxWithImage;
+
 GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
@@ -162,9 +168,14 @@ int main(int argc, char *argv[]) {
     g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
     g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
 
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)malloc(sizeof(PreviewBoxWithImage));
+    previewBoxWithImage->previewBox = previewBox;
+    previewBoxWithImage->imageWidget = NULL;
+    previewBoxWithImage->pixbuf = NULL;
+
     // Main buttons
-    g_signal_connect(openButton, "clicked", G_CALLBACK(openButtonClicked), previewBox);
-    g_signal_connect(saveButton, "clicked", G_CALLBACK(saveButtonClicked), NULL);
+    g_signal_connect(openButton, "clicked", G_CALLBACK(openButtonClicked), previewBoxWithImage);
+    g_signal_connect(saveButton, "clicked", G_CALLBACK(saveButtonClicked), previewBoxWithImage);
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
