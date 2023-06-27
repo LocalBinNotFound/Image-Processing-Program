@@ -70,7 +70,6 @@ int main(int argc, char *argv[]) {
     gchar *currentFolder = g_path_get_dirname(__FILE__);
     GtkWidget *image = gtk_image_new_from_file(g_build_filename(currentFolder, "wicked.jpeg", NULL));
     GtkWidget *imageBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *leftFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *rightFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -106,13 +105,16 @@ int main(int argc, char *argv[]) {
     gtk_entry_set_placeholder_text(GTK_ENTRY(rotateAngleTxtBox), "Enter rotation degree here");
     GtkWidget *mirrorLabel = gtk_label_new("Mirror Image");
 
+    /*
+    GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *creditText =  gtk_label_new("Authors:\n"
                                            "\tJunjie Fang - LocalBinNotFound\n"
                                            "\tWeijian Huang - learningmachine999\n"
                                            "\tQirui Yang - Antonyyqr\n"
                                            "\tXiyuan Tu - XiyuanTu");
-
     gtk_box_pack_start(GTK_BOX(creditsBox), creditText, FALSE, FALSE, 0);
+     */
+
     // Assign boxes
     gtk_box_set_center_widget(GTK_BOX(imageBox), image);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
@@ -138,10 +140,12 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorButtonBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorUpDownButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
+
     gtk_box_pack_start(GTK_BOX(overallBox), imageBox, FALSE, FALSE ,0);
     gtk_box_pack_start(GTK_BOX(overallBox), functionsAndPreviewBox, FALSE, FALSE, 0);
     gtk_box_set_spacing(GTK_BOX(leftFunctionBox), 50);
     gtk_box_set_spacing(GTK_BOX(rightFunctionBox),50);
+
     // Assign buttons
     GtkWidget *mainButtonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(mainButtonsBox), GTK_BUTTONBOX_SPREAD);
@@ -150,12 +154,22 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), saveButton);
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), exitButton);
 
-    // Connect signals
+    // RGB
+    GtkWidget *rScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->data);
+    GtkWidget *gScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->next->data);
+    GtkWidget *bScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->next->next->data);
+    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
+    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
+    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
+
+    // Main buttons
     g_signal_connect(openButton, "clicked", G_CALLBACK(openButtonClicked), previewBox);
     g_signal_connect(saveButton, "clicked", G_CALLBACK(saveButtonClicked), NULL);
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
-    GtkWidget *brightnessScale = gtk_container_get_children(GTK_CONTAINER(brightnessBox))->data;
+
+    // Brightness
+    GtkWidget *brightnessScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(brightnessBox))->next->data);
     g_signal_connect(brightnessScale, "value-changed", G_CALLBACK(adjustBrightness), NULL);
 
     // Add all widgets to the main window
