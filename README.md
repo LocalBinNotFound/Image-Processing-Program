@@ -4,17 +4,18 @@ This program is a simple program written in C that can read, modify, and write a
 (JPEG, PNG, BMP, HDR, PSD, TGA, GIF, PIC, PSD, PGM, PPM, ...). It has the following features and functions (more to be added as
 development progresses):
 1. A GUI: A simple graphical user interface created using GTK to load/preview/modify/save images and navigate in the program
-2. Brightness Adjustment: Increase or decrease the brightness of an image by adding
-or subtracting a constant value from each pixel's RGB components.
-3. Gaussian Blur (Soften): Blur an image using a Gaussian filter to smooth out noise and
+2. Brightness Adjustment: Increase or decrease the brightness of an image.
+3. Contrast Adjustment: Increase or decrease the contrast of an image.
+4. Gaussian Blur (Soften): Blur an image using a Gaussian filter to smooth out noise and
 reduce detail.
-4. Laplacian Sharpen (Sharpen): Sharpen an image using Laplacian filter to sharpen details and edges.
-5. Rotate Image: Rotate an image by a specified angle using interpolation techniques such as
+5. Laplacian Sharpen (Sharpen): Sharpen an image using Laplacian filter to sharpen details and edges. 6
+6. Rotate Image: Rotate an image by a specified angle using interpolation techniques such as
 the nearest-neighbor technique.
-6. Invert Color: Invert the RGB color of the image.
-7. Grayscale: Turn a color image to a grayscale image.
-8. Mirror Image: Produce a mirror image of the imported image.
-9. ...
+7. Invert Color: Invert the RGB color of the image.
+8. Grayscale: Turn a color image to a grayscale image.
+9. Mirror Image: Produce a mirror image of the imported image.
+10. RGB: change the red-green-blue (RGB) components of the image.
+11. ...
 
 ## Tools:
 - stb image -- single-file public domain libraries for C/C++
@@ -38,6 +39,6 @@ the nearest-neighbor technique.
 ## Program
 - to run program, navigate to project directory and type
   ```
-  gcc main.c image_functions.c xxx.c xxx.c -o Image_Processing `pkg-config --cflags --libs gtk+-3.0`
-  sudo ./Image_Processing
+  gcc main.c image_functions.c xxx.c xxx.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
+  sudo ./Image_Wicked
   ```

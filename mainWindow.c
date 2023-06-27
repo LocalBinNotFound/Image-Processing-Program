@@ -1,7 +1,8 @@
 #include <gtk/gtk.h>
 #include "buttonActions.h"
+#include "image_functions.h"
 
-GtkWidget* scaleBar(GtkOrientation orientation, const gchar* title) {
+GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
     GtkWidget* scale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
@@ -17,7 +18,7 @@ GtkWidget* scaleBar(GtkOrientation orientation, const gchar* title) {
     return box;
 }
 
-GtkWidget* tripleScaleBar(GtkOrientation orientation, const gchar* title) {
+GtkWidget* tripleScaleBarBox(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
     GtkWidget* rScale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
@@ -49,10 +50,9 @@ GtkWidget* boxWithBorder(GtkWidget* content) {
     GtkWidget* frame = gtk_frame_new(NULL);
     gtk_container_add(GTK_CONTAINER(frame), content);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 10);
-    gtk_box_pack_start(GTK_BOX(framedBox), frame, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(framedBox), frame, TRUE, TRUE, 10);
     return framedBox;
 }
-
 
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
@@ -67,16 +67,19 @@ int main(int argc, char *argv[]) {
 
     // Create boxes
     GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *image = gtk_image_new_from_file("/Users/junjiefang/Desktop/NEU/CS5008/Image_Wicked/wicked.jpeg");
+    GtkWidget *imageBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *leftFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *rightFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *previewBox = gtk_event_box_new();
-    GtkWidget *brightnessBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Brightness"));
-    GtkWidget *softenBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Blur"));
-    GtkWidget *sharpenBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Sharpen"));
-    GtkWidget *contrastBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Contrast"));
-    GtkWidget *grayscaleBox = boxWithBorder(scaleBar(GTK_ORIENTATION_HORIZONTAL, "Grayscale"));
-    GtkWidget *RGBBox = boxWithBorder(tripleScaleBar(GTK_ORIENTATION_HORIZONTAL, "RGB"));
+    GtkWidget *brightnessBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Brightness");
+    GtkWidget *softenBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Blur");
+    GtkWidget *sharpenBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Sharpen");
+    GtkWidget *contrastBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Contrast");
+    GtkWidget *grayscaleBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Grayscale");
+    GtkWidget *RGBBox = tripleScaleBarBox(GTK_ORIENTATION_HORIZONTAL, "RGB");
     GtkWidget *rotateBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
@@ -102,7 +105,15 @@ int main(int argc, char *argv[]) {
     gtk_entry_set_placeholder_text(GTK_ENTRY(rotateAngleTxtBox), "Enter rotation degree here");
     GtkWidget *mirrorLabel = gtk_label_new("Mirror Image");
 
+    GtkWidget *creditText =  gtk_label_new("Authors:\n"
+                                           "\tJunjie Fang - LocalBinNotFound\n"
+                                           "\tWeijian Huang - learningmachine999\n"
+                                           "\tQirui Yang - Antonyyqr\n"
+                                           "\tXiyuan Tu - XiyuanTu\n");
+    gtk_box_pack_start(GTK_BOX(creditsBox), creditText, FALSE, FALSE, 0);
     // Assign boxes
+    gtk_box_pack_start(GTK_BOX(imageBox), image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(imageBox), creditsBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
@@ -111,7 +122,7 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), grayscaleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(leftFunctionBox), RGBBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), RGBBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), rotateBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), mirrorBox, FALSE, FALSE, 0);
@@ -126,9 +137,9 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorButtonBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorUpDownButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
-
+    gtk_box_pack_start(GTK_BOX(overallBox), imageBox, FALSE, FALSE ,0);
     gtk_box_pack_start(GTK_BOX(overallBox), functionsAndPreviewBox, FALSE, FALSE, 0);
-
+    gtk_box_set_homogeneous(GTK_BOX(leftFunctionBox), TRUE);
     gtk_box_set_homogeneous(GTK_BOX(rightFunctionBox),TRUE);
     // Assign buttons
     GtkWidget *mainButtonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
@@ -143,6 +154,8 @@ int main(int argc, char *argv[]) {
     g_signal_connect(saveButton, "clicked", G_CALLBACK(saveButtonClicked), NULL);
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+    GtkWidget *brightnessScale = gtk_container_get_children(GTK_CONTAINER(brightnessBox))->data;
+    g_signal_connect(brightnessScale, "value-changed", G_CALLBACK(adjustBrightness), NULL);
 
     // Add all widgets to the main window
     gtk_container_add(GTK_CONTAINER(mainWindow), overallBox);

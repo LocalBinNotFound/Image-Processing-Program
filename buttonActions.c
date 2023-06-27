@@ -7,7 +7,6 @@
 
 void openButtonClicked(GtkWidget *button, gpointer imageFile) {
     GtkWidget *previewBox = GTK_WIDGET(imageFile);
-
     GtkWidget *fileChooser;
     gint res;
 

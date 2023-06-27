@@ -10,7 +10,7 @@ link_directories(${GTK3_LIBRARY_DIRS})
 include_directories(${GTK3_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/stb)
 
-add_executable(Image_Wicked mainWindow.c buttonActions.c buttonActions.h)
+add_executable(Image_Wicked mainWindow.c buttonActions.c buttonActions.h image_functions.c image_functions.h)
 
 target_link_libraries(Image_Wicked ${GTK3_LIBRARIES})
 target_link_libraries(Image_Wicked m)
