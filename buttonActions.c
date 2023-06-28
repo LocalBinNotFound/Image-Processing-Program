@@ -6,26 +6,26 @@
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
 
-typedef struct previewBoxWithImage {
+typedef struct {
     GtkWidget *previewBox;
-    GtkWidget *imageWidget;
-    GdkPixbuf *pixbuf;
+    GtkWidget *previewImageWidget;
+    GtkWidget *originalImageWidget;
+    GdkPixbuf *originalPixbuf;
 } PreviewBoxWithImage;
 
 void openButtonClicked(GtkWidget *button, gpointer data) {
     PreviewBoxWithImage *previewBoxWithImage = data;
     GtkWidget *previewBox = previewBoxWithImage->previewBox;
-    GtkWidget *fileChooser;
     gint res;
 
-    fileChooser = gtk_file_chooser_dialog_new("Open File",
-                                              GTK_WINDOW(gtk_widget_get_toplevel(button)),
-                                              GTK_FILE_CHOOSER_ACTION_OPEN,
-                                              "_Cancel",
-                                              GTK_RESPONSE_CANCEL,
-                                              "_Open",
-                                              GTK_RESPONSE_ACCEPT,
-                                              NULL);
+    GtkWidget *fileChooser = gtk_file_chooser_dialog_new("Open File",
+                                                         GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                         GTK_FILE_CHOOSER_ACTION_OPEN,
+                                                         "_Cancel",
+                                                         GTK_RESPONSE_CANCEL,
+                                                         "_Open",
+                                                         GTK_RESPONSE_ACCEPT,
+                                                         NULL);
 
     res = gtk_dialog_run(GTK_DIALOG(fileChooser));
     if (res == GTK_RESPONSE_ACCEPT) {
@@ -34,15 +34,24 @@ void openButtonClicked(GtkWidget *button, gpointer data) {
         filename = gtk_file_chooser_get_filename(chooser);
 
         int width, height, channels;
-        unsigned char *image = stbi_load(filename, &width, &height, &channels, STBI_rgb_alpha);
+        unsigned char *image = stbi_load(filename, &width, &height, &channels, 0);
         if (image == NULL) {
             printf("Failed to load image!\n");
         } else {
-            double aspectRatio = (double)width / (double)height;
-            GdkPixbuf *pixbuf = gdk_pixbuf_new_from_data(image, GDK_COLORSPACE_RGB, TRUE,
-                                                         8, width, height, width * 4, NULL, NULL);
+            int rowstride = width * channels;
+            unsigned char *alignedImage = (unsigned char *)g_malloc(height * rowstride);
+            memcpy(alignedImage, image, height * rowstride);
+
+            GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
+                                                                 8, width, height, rowstride, NULL, NULL);
+            previewBoxWithImage->originalPixbuf = originalPixbuf;
+
+            GtkWidget *originalImageWidget = gtk_image_new_from_pixbuf(originalPixbuf);
+            previewBoxWithImage->originalImageWidget = originalImageWidget;
+
             int boxWidth, boxHeight;
             gtk_widget_get_size_request(previewBox, &boxWidth, &boxHeight);
+            double aspectRatio = (double)width / (double)height;
             int newWidth, newHeight;
             if (aspectRatio > 1.0) {
                 newWidth = boxWidth;
@@ -51,15 +60,15 @@ void openButtonClicked(GtkWidget *button, gpointer data) {
                 newWidth =  (int) (boxHeight * aspectRatio);
                 newHeight = boxHeight;
             }
-            GdkPixbuf *scaledPixbuf = gdk_pixbuf_scale_simple(pixbuf, newWidth, newHeight, GDK_INTERP_BILINEAR);
-            previewBoxWithImage->pixbuf = scaledPixbuf;
-            GtkWidget *imageWidget = gtk_image_new_from_pixbuf(scaledPixbuf);
-            previewBoxWithImage->imageWidget = imageWidget;
-            gtk_container_foreach(GTK_CONTAINER(previewBox), (GtkCallback)gtk_widget_destroy, NULL);
-            gtk_container_add(GTK_CONTAINER(previewBox), imageWidget);
+            GdkPixbuf *scaledPixbuf = gdk_pixbuf_scale_simple(originalPixbuf, newWidth, newHeight, GDK_INTERP_BILINEAR);
 
+            GtkWidget *previewImageWidget = gtk_image_new_from_pixbuf(scaledPixbuf);
+            previewBoxWithImage->previewImageWidget = previewImageWidget;
+
+            gtk_container_foreach(GTK_CONTAINER(previewBox), (GtkCallback)gtk_widget_destroy, NULL);
+            gtk_container_add(GTK_CONTAINER(previewBox), previewImageWidget);
             gtk_widget_show_all(previewBox);
-            g_object_unref(pixbuf);
+
             stbi_image_free(image);
         }
         g_free(filename);
@@ -69,7 +78,7 @@ void openButtonClicked(GtkWidget *button, gpointer data) {
 
 void saveButtonClicked(GtkWidget *button, gpointer data) {
     PreviewBoxWithImage *previewBoxWithImage = data;
-    GdkPixbuf *pixbuf = previewBoxWithImage->pixbuf;
+    GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
     GtkWidget *dialog;
     GtkFileChooser *chooser;
     gint res;
@@ -84,18 +93,14 @@ void saveButtonClicked(GtkWidget *button, gpointer data) {
                                          NULL);
 
     chooser = GTK_FILE_CHOOSER(dialog);
-
     gtk_file_chooser_set_do_overwrite_confirmation(chooser, TRUE);
-
     res = gtk_dialog_run(GTK_DIALOG(dialog));
-
     if (res == GTK_RESPONSE_ACCEPT) {
         char *filename;
         filename = gtk_file_chooser_get_filename(chooser);
 
-        if (pixbuf != NULL) {
-            // Save the pixbuf to the specified file
-            bool success = gdk_pixbuf_save(pixbuf, filename, "png", NULL, NULL);
+        if (originalPixbuf != NULL) {
+            bool success = gdk_pixbuf_save(originalPixbuf, filename, "png", NULL, NULL);
             if (success) {
                 g_message("Image saved successfully.");
             } else {
@@ -104,12 +109,7 @@ void saveButtonClicked(GtkWidget *button, gpointer data) {
         } else {
             g_message("No image available to save.");
         }
-
         g_free(filename);
     }
-
     gtk_widget_destroy(dialog);
 }
-
-
-

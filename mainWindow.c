@@ -149,8 +149,8 @@ int main(int argc, char *argv[]) {
 
     gtk_box_pack_start(GTK_BOX(overallBox), imageBox, FALSE, FALSE ,0);
     gtk_box_pack_start(GTK_BOX(overallBox), functionsAndPreviewBox, FALSE, FALSE, 0);
-    gtk_box_set_spacing(GTK_BOX(leftFunctionBox), 50);
-    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),50);
+    gtk_box_set_spacing(GTK_BOX(leftFunctionBox), 40);
+    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),40);
 
     // Assign buttons
     GtkWidget *mainButtonsBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
@@ -160,18 +160,18 @@ int main(int argc, char *argv[]) {
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), saveButton);
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), exitButton);
 
-    // RGB
-    GtkWidget *rScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->data);
-    GtkWidget *gScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->next->data);
-    GtkWidget *bScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->next->next->data);
-    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
-    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
-    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), previewBox);
-
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)malloc(sizeof(PreviewBoxWithImage));
     previewBoxWithImage->previewBox = previewBox;
     previewBoxWithImage->imageWidget = NULL;
     previewBoxWithImage->pixbuf = NULL;
+
+    // RGB
+    GtkWidget *rScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->data);
+    GtkWidget *gScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->next->data);
+    GtkWidget *bScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->next->next->data);
+    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
+    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
+    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
 
     // Main buttons
     g_signal_connect(openButton, "clicked", G_CALLBACK(openButtonClicked), previewBoxWithImage);
