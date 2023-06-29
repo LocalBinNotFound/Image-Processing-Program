@@ -6,16 +6,42 @@
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
 
-typedef struct {
+typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
-    GtkWidget *originalImageWidget;
     GdkPixbuf *originalPixbuf;
 } PreviewBoxWithImage;
 
+// call this function to update the preview image whenever originalPixbuf has been modified
+void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage) {
+    GtkWidget *previewBox = previewBoxWithImage->previewBox;
+    GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+
+    if (originalPixbuf != NULL) {
+        int boxWidth, boxHeight;
+        gtk_widget_get_size_request(previewBox, &boxWidth, &boxHeight);
+        double aspectRatio = (double)gdk_pixbuf_get_width(originalPixbuf) / (double)gdk_pixbuf_get_height(originalPixbuf);
+        int newWidth, newHeight;
+        if (aspectRatio > 1.0) {
+            newWidth = boxWidth;
+            newHeight = (int)(boxWidth / aspectRatio);
+        } else {
+            newWidth = (int)(boxHeight * aspectRatio);
+            newHeight = boxHeight;
+        }
+        GdkPixbuf *scaledPixbuf = gdk_pixbuf_scale_simple(originalPixbuf, newWidth, newHeight, GDK_INTERP_BILINEAR);
+        GtkWidget *previewImageWidget = gtk_image_new_from_pixbuf(scaledPixbuf);
+        if (previewBoxWithImage->previewImageWidget != NULL) {
+            gtk_container_remove(GTK_CONTAINER(previewBox), previewBoxWithImage->previewImageWidget);
+        }
+        previewBoxWithImage->previewImageWidget = previewImageWidget;
+        gtk_container_add(GTK_CONTAINER(previewBox), previewImageWidget);
+        gtk_widget_show_all(previewBox);
+    }
+}
+
 void openButtonClicked(GtkWidget *button, gpointer data) {
     PreviewBoxWithImage *previewBoxWithImage = data;
-    GtkWidget *previewBox = previewBoxWithImage->previewBox;
     gint res;
 
     GtkWidget *fileChooser = gtk_file_chooser_dialog_new("Open File",
@@ -45,31 +71,8 @@ void openButtonClicked(GtkWidget *button, gpointer data) {
             GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
                                                                  8, width, height, rowstride, NULL, NULL);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
-
-            GtkWidget *originalImageWidget = gtk_image_new_from_pixbuf(originalPixbuf);
-            previewBoxWithImage->originalImageWidget = originalImageWidget;
-
-            int boxWidth, boxHeight;
-            gtk_widget_get_size_request(previewBox, &boxWidth, &boxHeight);
-            double aspectRatio = (double)width / (double)height;
-            int newWidth, newHeight;
-            if (aspectRatio > 1.0) {
-                newWidth = boxWidth;
-                newHeight = (int) (boxWidth / aspectRatio);
-            } else {
-                newWidth =  (int) (boxHeight * aspectRatio);
-                newHeight = boxHeight;
-            }
-            GdkPixbuf *scaledPixbuf = gdk_pixbuf_scale_simple(originalPixbuf, newWidth, newHeight, GDK_INTERP_BILINEAR);
-
-            GtkWidget *previewImageWidget = gtk_image_new_from_pixbuf(scaledPixbuf);
-            previewBoxWithImage->previewImageWidget = previewImageWidget;
-
-            gtk_container_foreach(GTK_CONTAINER(previewBox), (GtkCallback)gtk_widget_destroy, NULL);
-            gtk_container_add(GTK_CONTAINER(previewBox), previewImageWidget);
-            gtk_widget_show_all(previewBox);
-
             stbi_image_free(image);
+            updatePreviewBox(previewBoxWithImage);
         }
         g_free(filename);
     }

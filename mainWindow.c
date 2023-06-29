@@ -1,12 +1,6 @@
 #include <gtk/gtk.h>
-#include "buttonActions.h"
-#include "image_functions.h"
-
-typedef struct previewBoxWithImage {
-    GtkWidget *previewBox;
-    GtkWidget *imageWidget;
-    GdkPixbuf *pixbuf;
-} PreviewBoxWithImage;
+#include "functionalButtons.h"
+#include "imageModifications.h"
 
 GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -17,13 +11,12 @@ GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
     gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_BOTTOM);
     gtk_widget_set_size_request(scale, 200, -1);
     gtk_range_set_value(GTK_RANGE(scale), 50.0);
-
     gtk_box_pack_start(GTK_BOX(box), titleLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), scale, TRUE, TRUE, 0);
-
     return box;
 }
 
+// for RGB module
 GtkWidget* tripleScaleBarBox(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
@@ -73,9 +66,6 @@ int main(int argc, char *argv[]) {
 
     // Create boxes
     GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gchar *currentFolder = g_path_get_dirname(__FILE__);
-    GtkWidget *image = gtk_image_new_from_file(g_build_filename(currentFolder, "wicked.jpeg", NULL));
-    GtkWidget *imageBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *leftFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *rightFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -90,6 +80,11 @@ int main(int argc, char *argv[]) {
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     GtkWidget *rotateButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+
+    // logo
+    gchar *currentFolder = g_path_get_dirname(__FILE__);
+    GtkWidget *image = gtk_image_new_from_file(g_build_filename(currentFolder, "wicked.png", NULL));
+    GtkWidget *imageBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
 
     // Initialize buttons
     GtkWidget *openButton = gtk_button_new_with_label("Open");
@@ -162,8 +157,8 @@ int main(int argc, char *argv[]) {
 
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)malloc(sizeof(PreviewBoxWithImage));
     previewBoxWithImage->previewBox = previewBox;
-    previewBoxWithImage->imageWidget = NULL;
-    previewBoxWithImage->pixbuf = NULL;
+    previewBoxWithImage->previewImageWidget = NULL;
+    previewBoxWithImage->originalPixbuf = NULL;
 
     // RGB
     GtkWidget *rScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(RGBBox))->next->data);
@@ -182,6 +177,9 @@ int main(int argc, char *argv[]) {
     // Brightness
     GtkWidget *brightnessScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(brightnessBox))->next->data);
     g_signal_connect(brightnessScale, "value-changed", G_CALLBACK(adjustBrightness), NULL);
+
+    // invert color
+    g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertButtonClicked), previewBoxWithImage);
 
     // Add all widgets to the main window
     gtk_container_add(GTK_CONTAINER(mainWindow), overallBox);
