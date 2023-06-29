@@ -12,5 +12,4 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/stb)
 
 add_executable(Image_Wicked main_window.c function_buttons.c function_buttons.h image_modifications.c image_modifications.h)
 
-target_link_libraries(Image_Wicked ${GTK3_LIBRARIES})
-target_link_libraries(Image_Wicked m)
+target_link_libraries(Image_Wicked ${GTK3_LIBRARIES} m)

@@ -39,6 +39,6 @@ the nearest-neighbor technique.
 ## Program
 - to run program, navigate to project directory and type
   ```
-  gcc main.c image_functions.c xxx.c xxx.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
+  gcc main.c image_functions.c xxx.c xxx.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0` -lopencv_core -lopencv_imgproc
   sudo ./Image_Wicked
   ```

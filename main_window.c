@@ -216,7 +216,9 @@ int main(int argc, char *argv[]) {
 
     gtk_main();
 
-    g_object_unref(previewBoxWithImage->originalPixbuf);
+    if (previewBoxWithImage->originalPixbuf != NULL) {
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+    }
     g_free(previewBoxWithImage);
     g_list_free_full(children, (GDestroyNotify)gtk_widget_destroy);
 
