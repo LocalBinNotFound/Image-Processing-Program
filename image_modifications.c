@@ -1,10 +1,14 @@
 #include <gtk/gtk.h>
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
-#include "functionalButtons.h"
+#include "function_buttons.h"
 
 
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
+}
+
+void adjustContrast(GtkWidget* scale, gpointer imageFile) {
+
 }
 
 void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
@@ -13,10 +17,10 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
 void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
 }
 
-void rotateImage() {
+void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
 }
 
-void grayscale(GtkWidget* scale, gpointer imageFile) {
+void rotateByDegree() {
 }
 
 void mirrorImage() {
@@ -25,7 +29,7 @@ void mirrorImage() {
 void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidget *previewBox) {
 }
 
-void invertButtonClicked(GtkWidget *button, gpointer imageFile) {
+void invertColor(GtkWidget *button, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
     GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
 

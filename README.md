@@ -1,6 +1,6 @@
 # Image Wicked
 ## Description
-This program is a simple program written in C that can read, modify, and write an image file of mainstream formats
+This program is a simple program that can read, modify, preview, and write an image file of mainstream formats
 (JPEG, PNG, BMP, HDR, PSD, TGA, GIF, PIC, PSD, PGM, PPM, ...). It has the following features and functions (more to be added as
 development progresses):
 1. A GUI: A simple graphical user interface created using GTK to load/preview/modify/save images and navigate in the program
