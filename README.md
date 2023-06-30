@@ -30,15 +30,20 @@ the nearest-neighbor technique.
   - GTK 4.x is not necessary for this project - see: https://github.com/GNOME/gtk
   - GTK-3.0 documentation https://docs.gtk.org/gtk3/index.html
   - to install GTK 3.24.28, in terminal (assume homebrew has already been installed), type `brew install gtk+3`
-    - verify installation is successful using `brew info gtk+3`
 
-- PkgConfig
-  - in terminal (assume homebrew has already been installed), type `brew install pkg-config`
-    - verify installation is successful using `brew info pkg-config`
+
+- ImageMagick -- open-source software suite used for editing and manipulating digital images
+  - ImageMagick 7.1.1-12 is the latest version - see: https://github.com/ImageMagick
+  - ImageMagick is primarily written in C++ but has a C API called MagickWand
+  - to install ImageMagick, in terminal, type `brew install imagemagick`
+
+
+- PkgConfig -- package search and retrieval tool for UNIX-like OS
+  - in terminal, type `brew install pkg-config`
 
 ## Program
 - to run program, navigate to project directory and type
   ```
-  gcc main.c image_functions.c xxx.c xxx.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0` -lopencv_core -lopencv_imgproc
+  gcc main.c image_functions.c xxx.c xxx.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
   sudo ./Image_Wicked
   ```
