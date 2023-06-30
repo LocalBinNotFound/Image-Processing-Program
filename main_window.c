@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
     // invert color
     GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
-    g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColorButton), previewBoxWithImage);
+    g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
 
     /*
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
