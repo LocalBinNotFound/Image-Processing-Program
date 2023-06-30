@@ -32,12 +32,6 @@ the nearest-neighbor technique.
   - to install GTK 3.24.28, in terminal (assume homebrew has already been installed), type `brew install gtk+3`
 
 
-- ImageMagick -- open-source software suite used for editing and manipulating digital images
-  - ImageMagick 7.1.1-12 is the latest version - see: https://github.com/ImageMagick
-  - ImageMagick is primarily written in C++ but has a C API called MagickWand
-  - to install ImageMagick, in terminal, type `brew install imagemagick`
-
-
 - PkgConfig -- package search and retrieval tool for UNIX-like OS
   - in terminal, type `brew install pkg-config`
 

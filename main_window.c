@@ -135,12 +135,14 @@ int main(int argc, char *argv[]) {
     GtkWidget *softenBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Blur");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
     GtkWidget *softenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(softenBox))->next->data);
+    gtk_range_set_value(GTK_RANGE(softenScale), 0.0);
     g_signal_connect(softenScale, "value-changed", G_CALLBACK(gaussianBlur), NULL);
 
     // sharpen
     GtkWidget *sharpenBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Sharpen");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
     GtkWidget *sharpenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(sharpenBox))->next->data);
+    gtk_range_set_value(GTK_RANGE(sharpenScale), 0.0);
     g_signal_connect(sharpenScale, "value-changed", G_CALLBACK(laplacianSharpen), NULL);
 
     // grayscale
@@ -198,7 +200,7 @@ int main(int argc, char *argv[]) {
     // invert color
     GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
-    g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
+    g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColorButton), previewBoxWithImage);
 
     /*
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
