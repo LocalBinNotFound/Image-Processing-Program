@@ -2,7 +2,6 @@
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
 #include "function_buttons.h"
-#include <MagickWand/MagickWand.h>
 
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
 }
