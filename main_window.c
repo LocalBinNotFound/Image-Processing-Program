@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *brightnessBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Brightness");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), brightnessBox, FALSE, FALSE, 0);
     GtkWidget *brightnessScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(brightnessBox))->next->data);
-    g_signal_connect(brightnessScale, "value-changed", G_CALLBACK(adjustBrightness), NULL);
+    g_signal_connect(brightnessScale, "value-changed", G_CALLBACK(adjustBrightness), previewBoxWithImage);
 
     // contrast
     GtkWidget *contrastBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Contrast");
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
     // invert color
     GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
-    /********/g_signal_connect(invertColorButton, "clicked", G_CALLBACK(adjustBrightness), previewBoxWithImage);
+    /********/g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
 
     /*
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);

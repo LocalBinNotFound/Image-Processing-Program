@@ -6,11 +6,12 @@
 
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
-    GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
 
-    if (originalPixbuf != NULL) {
-        int brightnessValue = 20;
-
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust brightness!");
+    } else {
+        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+        int brightnessValue = gtk_range_get_value(GTK_RANGE(scale));
         GdkPixbuf *brightPixbuf = gdk_pixbuf_copy(originalPixbuf);
 
         int width = gdk_pixbuf_get_width(brightPixbuf);
@@ -39,8 +40,6 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
 
         updatePreviewBox(previewBoxWithImage);
         g_message("Image brightness adjusted!");
-    } else {
-        g_message("No image available to adjust brightness!");
     }
 }
 
@@ -51,9 +50,11 @@ void adjustContrast(GtkWidget* button, gpointer imageFile) {
 
 void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
-    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
 
-    if (originalPixbuf != NULL) {
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to blur!");
+    } else {
+        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
         GdkPixbuf* blurredPixbuf = gdk_pixbuf_copy(originalPixbuf);
         int width = gdk_pixbuf_get_width(blurredPixbuf);
         int height = gdk_pixbuf_get_height(blurredPixbuf);
@@ -100,8 +101,6 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
         previewBoxWithImage->originalPixbuf = blurredPixbuf;
         updatePreviewBox(previewBoxWithImage);
         g_message("Image blurred successfully!");
-    } else {
-        g_message("No image available to blur!");
     }
 }
 
@@ -132,9 +131,11 @@ void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidge
 
 void invertColor(GtkWidget *scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
-    GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
 
-    if (originalPixbuf != NULL) {
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to invert!");
+    } else {
+        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
         GdkPixbuf *invertedPixbuf = gdk_pixbuf_copy(originalPixbuf);
 
         int width = gdk_pixbuf_get_width(invertedPixbuf);
@@ -158,8 +159,6 @@ void invertColor(GtkWidget *scale, gpointer imageFile) {
         updatePreviewBox(previewBoxWithImage);
 
         g_message("Image inverted successfully!");
-    } else {
-        g_message("No image available to invert!");
     }
 }
 

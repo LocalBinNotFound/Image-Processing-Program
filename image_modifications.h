@@ -3,7 +3,7 @@
 #define IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
 
 #include <gtk/gtk.h>
-#include <MagickWand/MagickWand.h>
+//#include <MagickWand/MagickWand.h>
 
 void adjustBrightness(GtkWidget* scale, gpointer imageFile);
 void adjustContrast(GtkWidget* scale, gpointer imageFile);
