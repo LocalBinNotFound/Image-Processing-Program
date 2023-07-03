@@ -15,5 +15,4 @@ void mirrorImage();
 void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidget *previewBox);
 void invertColor(GtkWidget *button, gpointer imageFile);
 
-
 #endif //IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H

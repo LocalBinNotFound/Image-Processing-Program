@@ -314,15 +314,70 @@ void rotateByDegree(int degree, gpointer imageFile) {
     }
 }
 
-    void mirrorImageUpDown() {
+PreviewBoxWithImage* getPreviewBoxImage(GtkWidget* previewBox) {
+    // Cast the widget to a GtkImage
+    GtkImage* image = GTK_IMAGE(previewBox);
+
+    // Get the Pixbuf from the GtkImage
+    GdkPixbuf* pixbuf = gtk_image_get_pixbuf(image);
+
+    // Create a new PreviewBoxWithImage structure
+    PreviewBoxWithImage* previewBoxWithImage = malloc(sizeof(PreviewBoxWithImage));
+    previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(pixbuf);
+
+    return previewBoxWithImage;
 }
+
+void mirrorImageUpDown(GtkWidget* previewBox) {
+    // Retrieve the original image from the preview box
+    PreviewBoxWithImage* previewBoxWithImage = getPreviewBoxImage(previewBox);
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to mirror!");
+        return;
+    }
+
+    // Retrieve the original pixbuf and its properties
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    int width = gdk_pixbuf_get_width(originalPixbuf);
+    int height = gdk_pixbuf_get_height(originalPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+
+    // Create a new pixbuf for the mirrored image
+    GdkPixbuf* mirroredPixbuf = gdk_pixbuf_copy(originalPixbuf);
+    guint8* pixels = gdk_pixbuf_get_pixels(mirroredPixbuf);
+
+    // Iterate over each row of pixels and mirror them vertically
+    for (int y = 0; y < height / 2; ++y) {
+        // Compute the corresponding row index for mirroring
+        int mirroredY = height - y - 1;
+
+        // Swap the pixel data between the original row and the mirrored row
+        guint8* originalRow = pixels + y * rowstride;
+        guint8* mirroredRow = pixels + mirroredY * rowstride;
+        for (int x = 0; x < width * channels; ++x) {
+            guint8 temp = originalRow[x];
+            originalRow[x] = mirroredRow[x];
+            mirroredRow[x] = temp;
+        }
+    }
+
+    // Update the originalPixbuf in the previewBoxWithImage structure with the mirrored image
+    g_object_unref(previewBoxWithImage->originalPixbuf);
+    previewBoxWithImage->originalPixbuf = mirroredPixbuf;
+
+    // Update the preview box with the mirrored image
+    updatePreviewBox(previewBoxWithImage);
+
+    g_message("Image mirrored vertically!");
+}
+
 
 void mirrorImageLeftRight() {
 }
 
-
 void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidget *previewBox) {
-
 }
 
 void invertColor(GtkWidget *scale, gpointer imageFile) {
@@ -358,6 +413,42 @@ void invertColor(GtkWidget *scale, gpointer imageFile) {
     }
 }
 
-void adjustTransparency() {
 
+void adjustTransparency(GtkWidget *scale, gpointer imageFile) {
+    PreviewBoxWithImage *previewBoxWithImage = (PreviewBoxWithImage *)imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust transparency!");
+    } else {
+        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+        double transparencyValue = gtk_range_get_value(GTK_RANGE(scale));
+
+        // Ensure transparency value is within valid range [0.0, 1.0]
+        transparencyValue = CLAMP(transparencyValue, 0.0, 1.0);
+
+        GdkPixbuf *transparencyPixbuf = gdk_pixbuf_copy(originalPixbuf);
+
+        int width = gdk_pixbuf_get_width(transparencyPixbuf);
+        int height = gdk_pixbuf_get_height(transparencyPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(transparencyPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(transparencyPixbuf);
+
+        guint8 *pixels = gdk_pixbuf_get_pixels(transparencyPixbuf);
+
+        // Iterate over each pixel and adjust the transparency value
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                guint8 *pixel = pixels + y * rowstride + x * channels;
+
+                // Adjust the alpha channel (transparency)
+                pixel[3] = (guint8)(pixel[3] * transparencyValue);
+            }
+        }
+
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+        previewBoxWithImage->originalPixbuf = transparencyPixbuf;
+
+        updatePreviewBox(previewBoxWithImage);
+        g_message("Transparency adjusted successfully!");
+    }
 }
