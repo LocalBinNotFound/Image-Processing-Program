@@ -43,9 +43,42 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
-
 void adjustContrast(GtkWidget* button, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
 
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust contrast!");
+    } else {
+        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+        int contrastValue = gtk_range_get_value(GTK_RANGE(button));
+        GdkPixbuf* contrastPixbuf = gdk_pixbuf_copy(originalPixbuf);
+
+        int width = gdk_pixbuf_get_width(contrastPixbuf);
+        int height = gdk_pixbuf_get_height(contrastPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(contrastPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(contrastPixbuf);
+
+        guint8* startPixel = gdk_pixbuf_get_pixels(contrastPixbuf);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                guint8* pixel = startPixel + y * rowstride + x * channels;
+
+                for (int c = 0; c < channels; c++) {
+                    double pixelValue = pixel[c] / 255.0;
+                    double adjustedValue = (pixelValue - 0.5) * contrastValue + 0.5;
+                    guint8 newValue = (guint8)(adjustedValue * 255);
+
+                    pixel[c] = newValue;
+                }
+            }
+        }
+
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+        previewBoxWithImage->originalPixbuf = contrastPixbuf;
+
+        updatePreviewBox(previewBoxWithImage);
+        g_message("Image contrast adjusted!");
+    }
 }
 
 void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
@@ -104,16 +137,89 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
-void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
-    double laplacianKernel[3][3] = {
-            {-1, -1, -1},
-            {-1, 9, -1},
-            {-1, -1, -1}
-    };
+void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
 
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to apply Laplacian sharpening!");
+    } else {
+        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+        GdkPixbuf* sharpenedPixbuf = gdk_pixbuf_copy(originalPixbuf);
+
+        int width = gdk_pixbuf_get_width(sharpenedPixbuf);
+        int height = gdk_pixbuf_get_height(sharpenedPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(sharpenedPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(sharpenedPixbuf);
+
+        guint8* pixels = gdk_pixbuf_get_pixels(sharpenedPixbuf);
+
+        double laplacianKernel[3][3] = {
+                {-1, -1, -1},
+                {-1, 9, -1},
+                {-1, -1, -1}
+        };
+
+        for (int y = 1; y < height - 1; ++y) {
+            for (int x = 1; x < width - 1; ++x) {
+                for (int c = 0; c < channels; ++c) {
+                    double sum = 0.0;
+                    for (int i = -1; i <= 1; ++i) {
+                        for (int j = -1; j <= 1; ++j) {
+                            guint8* pixel = pixels + (y + i) * rowstride + (x + j) * channels + c;
+                            double value = *pixel * laplacianKernel[i + 1][j + 1];
+                            sum += value;
+                        }
+                    }
+                    guint8* sharpenedPixel = pixels + y * rowstride + x * channels + c;
+                    *sharpenedPixel = (guint8)fmax(fmin(sum, 255), 0);
+                }
+            }
+        }
+
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+        previewBoxWithImage->originalPixbuf = sharpenedPixbuf;
+
+        updatePreviewBox(previewBoxWithImage);
+        g_message("Image sharpened using Laplacian filter!");
+    }
 }
 
 void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to convert to grayscale!");
+    } else {
+        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+        GdkPixbuf* grayscalePixbuf = gdk_pixbuf_copy(originalPixbuf);
+
+        int width = gdk_pixbuf_get_width(grayscalePixbuf);
+        int height = gdk_pixbuf_get_height(grayscalePixbuf);
+        int channels = gdk_pixbuf_get_n_channels(grayscalePixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(grayscalePixbuf);
+
+        guint8* pixels = gdk_pixbuf_get_pixels(grayscalePixbuf);
+
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                guint8* pixel = pixels + y * rowstride + x * channels;
+
+                // Calculate grayscale value
+                guint8 grayValue = (guint8)((pixel[0] + pixel[1] + pixel[2]) / 3);
+
+                // Set grayscale value for all color channels
+                for (int c = 0; c < channels; ++c) {
+                    pixel[c] = grayValue;
+                }
+            }
+        }
+
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+        previewBoxWithImage->originalPixbuf = grayscalePixbuf;
+
+        updatePreviewBox(previewBoxWithImage);
+        g_message("Image converted to grayscale!");
+    }
 }
 
 void rotateByDegree(int degree, gpointer imageFile) {
@@ -124,6 +230,7 @@ void mirrorImageUpDown() {
 
 void mirrorImageLeftRight() {
 }
+
 
 void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidget *previewBox) {
 
