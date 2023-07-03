@@ -4,6 +4,8 @@
 #include "function_buttons.h"
 #include <math.h>
 
+void retrieveOriginalImage();
+
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
@@ -223,9 +225,96 @@ void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
 }
 
 void rotateByDegree(int degree, gpointer imageFile) {
+    PreviewBoxWithImage *previewBoxWithImage = (PreviewBoxWithImage *) imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to rotate!");
+    } else {
+        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+
+        // Calculate the radians from the degree
+        double radians = degree * (G_PI / 180.0);
+
+        // Compute the new image dimensions after rotation
+        int originalWidth = gdk_pixbuf_get_width(originalPixbuf);
+        int originalHeight = gdk_pixbuf_get_height(originalPixbuf);
+        int rotatedWidth = (int) (fabs(originalWidth * cos(radians)) + fabs(originalHeight * sin(radians)));
+        int rotatedHeight = (int) (fabs(originalWidth * sin(radians)) + fabs(originalHeight * cos(radians)));
+
+        // Create a new pixbuf for the rotated image
+        GdkPixbuf *rotatedPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, rotatedWidth, rotatedHeight);
+        guchar *pixels = gdk_pixbuf_get_pixels(rotatedPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(rotatedPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(rotatedPixbuf);
+
+        // Compute the center coordinates of the rotated image
+        double centerX = rotatedWidth / 2.0;
+        double centerY = rotatedHeight / 2.0;
+
+        // Compute the sine and cosine values of the rotation angle
+        double sinTheta = sin(radians);
+        double cosTheta = cos(radians);
+
+        // Iterate over each pixel in the rotated image
+        for (int y = 0; y < rotatedHeight; ++y) {
+            for (int x = 0; x < rotatedWidth; ++x) {
+                // Compute the original image coordinates corresponding to the rotated pixel
+                double originalX = cosTheta * (x - centerX) + sinTheta * (y - centerY) + originalWidth / 2.0;
+                double originalY = -sinTheta * (x - centerX) + cosTheta * (y - centerY) + originalHeight / 2.0;
+
+                // Check if the original image coordinates are within bounds
+                if (originalX >= 0 && originalX < originalWidth && originalY >= 0 && originalY < originalHeight) {
+                    // Get the interpolated pixel values from the original image
+                    int x1 = (int) originalX;
+                    int y1 = (int) originalY;
+                    int x2 = (x1 + 1 < originalWidth) ? (x1 + 1) : x1;
+                    int y2 = (y1 + 1 < originalHeight) ? (y1 + 1) : y1;
+                    double alpha = originalX - x1;
+                    double beta = originalY - y1;
+
+                    guint8 *pixel1 =
+                            gdk_pixbuf_get_pixels(originalPixbuf) + y1 * gdk_pixbuf_get_rowstride(originalPixbuf) +
+                            x1 * channels;
+                    guint8 *pixel2 =
+                            gdk_pixbuf_get_pixels(originalPixbuf) + y1 * gdk_pixbuf_get_rowstride(originalPixbuf) +
+                            x2 * channels;
+                    guint8 *pixel3 =
+                            gdk_pixbuf_get_pixels(originalPixbuf) + y2 * gdk_pixbuf_get_rowstride(originalPixbuf) +
+                            x1 * channels;
+                    guint8 *pixel4 =
+                            gdk_pixbuf_get_pixels(originalPixbuf) + y2 * gdk_pixbuf_get_rowstride(originalPixbuf) +
+                            x2 * channels;
+                    // Interpolate the pixel values using bilinear interpolation
+                    for (int c = 0; c < channels; ++c) {
+                        double interpolatedValue = (1 - alpha) * (1 - beta) * pixel1[c] +
+                                                   alpha * (1 - beta) * pixel2[c] +
+                                                   (1 - alpha) * beta * pixel3[c] +
+                                                   alpha * beta * pixel4[c];
+
+                        // Assign the interpolated value to the corresponding pixel in the rotated image
+                        pixels[y * rowstride + x * channels + c] = (guchar) interpolatedValue;
+                    }
+                } else {
+                    // Assign black color to out-of-bounds pixels
+                    for (int c = 0; c < channels; ++c) {
+                        pixels[y * rowstride + x * channels + c] = 0;
+                    }
+                }
+            }
+        }
+
+        // Update the originalPixbuf in the imageFile structure with the rotated image
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+        previewBoxWithImage->originalPixbuf = rotatedPixbuf;
+
+        // Update the preview box with the rotated image
+        updatePreviewBox(previewBoxWithImage);
+
+        g_message("Image rotated by %d degrees!", degree);
+    }
 }
 
-void mirrorImageUpDown() {
+    void mirrorImageUpDown() {
 }
 
 void mirrorImageLeftRight() {
