@@ -4,8 +4,6 @@
 #include "function_buttons.h"
 #include <math.h>
 
-void retrieveOriginalImage();
-
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
@@ -139,6 +137,7 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
+// ?
 void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
 
@@ -224,6 +223,8 @@ void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
+
+// Rotate an image by a specified angle using interpolation techniques such as nearest-neighbor technique
 void rotateByDegree(int degree, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = (PreviewBoxWithImage *) imageFile;
 
@@ -328,6 +329,7 @@ PreviewBoxWithImage* getPreviewBoxImage(GtkWidget* previewBox) {
     return previewBoxWithImage;
 }
 
+// need to implement
 void mirrorImageUpDown(GtkWidget* previewBox) {
     // Retrieve the original image from the preview box
     PreviewBoxWithImage* previewBoxWithImage = getPreviewBoxImage(previewBox);
@@ -373,11 +375,13 @@ void mirrorImageUpDown(GtkWidget* previewBox) {
     g_message("Image mirrored vertically!");
 }
 
-
+// need to implement
 void mirrorImageLeftRight() {
 }
 
-void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidget *previewBox) {
+
+// need to implement
+void adjustRGB() {
 }
 
 void invertColor(GtkWidget *scale, gpointer imageFile) {

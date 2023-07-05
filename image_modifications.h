@@ -12,7 +12,8 @@ void laplacianSharpen(GtkWidget* scale, gpointer imageFile);
 void adjustGrayscale(GtkWidget* scale, gpointer imageFile);
 void rotateByDegree();
 void mirrorImage();
-void adjustRGB(GtkWidget *rScale, GtkWidget *gScale, GtkWidget *bScale, GtkWidget *previewBox);
+void adjustRGB();
 void invertColor(GtkWidget *button, gpointer imageFile);
+void adjustTransparency(GtkWidget *scale, gpointer imageFile);
 
 #endif //IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
