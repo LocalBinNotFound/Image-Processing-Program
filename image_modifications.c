@@ -55,33 +55,35 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
-
-void adjustContrast(GtkWidget* button, gpointer imageFile) {
+void adjustContrast(GtkWidget* scale, gpointer imageFile) {
+    static double previousScaleValue = 0.0;
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to adjust contrast!");
     } else {
         GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
-        int contrastValue = gtk_range_get_value(GTK_RANGE(button));
+        double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
+        double contrastChange = contrastValue - previousScaleValue;
+
         GdkPixbuf* contrastPixbuf = gdk_pixbuf_copy(originalPixbuf);
 
         int width = gdk_pixbuf_get_width(contrastPixbuf);
         int height = gdk_pixbuf_get_height(contrastPixbuf);
         int channels = gdk_pixbuf_get_n_channels(contrastPixbuf);
         int rowstride = gdk_pixbuf_get_rowstride(contrastPixbuf);
+        guint8* pixels = gdk_pixbuf_get_pixels(contrastPixbuf);
 
-        guint8* startPixel = gdk_pixbuf_get_pixels(contrastPixbuf);
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                guint8* pixel = startPixel + y * rowstride + x * channels;
+        double factor = (259.0 * (contrastChange + 255.0)) / (255.0 * (259.0 - contrastChange));
 
-                for (int c = 0; c < channels; c++) {
-                    double pixelValue = pixel[c] / 255.0;
-                    double adjustedValue = (pixelValue - 0.5) * contrastValue + 0.5;
-                    guint8 newValue = (guint8)(adjustedValue * 255);
-
-                    pixel[c] = newValue;
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                for (int c = 0; c < channels; ++c) {
+                    if (c != channels - 1) {
+                        guint8* pixel = pixels + y * rowstride + x * channels + c;
+                        double newValue = factor * (*pixel - 128.0) + 128.0;
+                        *pixel = (guint8)fmin(fmax(newValue, 0.0), 255.0);
+                    }
                 }
             }
         }
@@ -91,8 +93,11 @@ void adjustContrast(GtkWidget* button, gpointer imageFile) {
 
         updatePreviewBox(previewBoxWithImage);
         g_message("Image contrast adjusted!");
+
+        previousScaleValue = contrastValue;
     }
 }
+
 
 void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;

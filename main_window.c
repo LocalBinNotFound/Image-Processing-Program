@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *contrastBox = scaleNeg50To50(GTK_ORIENTATION_HORIZONTAL, "Contrast");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), contrastBox, FALSE, FALSE, 0);
     GtkWidget *contrastScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(contrastBox))->next->data);
-    g_signal_connect(contrastScale, "value-changed", G_CALLBACK(adjustContrast), NULL);
+    g_signal_connect(contrastScale, "value-changed", G_CALLBACK(adjustContrast), previewBoxWithImage);
 
     // soften
     GtkWidget *softenBox = scale0To100(GTK_ORIENTATION_HORIZONTAL, "Blur");
