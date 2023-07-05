@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *sharpenBox = scale0To100(GTK_ORIENTATION_HORIZONTAL, "Sharpen");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
     GtkWidget *sharpenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(sharpenBox))->next->data);
-    g_signal_connect(sharpenScale, "value-changed", G_CALLBACK(laplacianSharpen), NULL);
+    g_signal_connect(sharpenScale, "value-changed", G_CALLBACK(laplacianSharpen), previewBoxWithImage);
 
     // grayscale
     GtkWidget *grayscaleBox = scaleNeg50To50(GTK_ORIENTATION_HORIZONTAL, "Grayscale");
