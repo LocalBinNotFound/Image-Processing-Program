@@ -149,13 +149,22 @@ int main(int argc, char *argv[]) {
     GtkWidget *softenBox = scale0To100(GTK_ORIENTATION_HORIZONTAL, "Blur");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
     GtkWidget *softenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(softenBox))->next->data);
-    g_signal_connect(softenScale, "value-changed", G_CALLBACK(gaussianBlur), NULL);
+    g_signal_connect(softenScale, "value-changed", G_CALLBACK(gaussianBlur), previewBoxWithImage);
 
     // sharpen
-    GtkWidget *sharpenBox = scale0To100(GTK_ORIENTATION_HORIZONTAL, "Sharpen");
+    GtkWidget *sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget *sharpenLabel = gtk_label_new("Sharpen");
+    GtkWidget *sharpenScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 1.0, 0.1);
+    gtk_scale_set_draw_value(GTK_SCALE(sharpenScale), TRUE);
+    gtk_scale_set_has_origin(GTK_SCALE(sharpenScale), TRUE);
+    gtk_scale_set_value_pos(GTK_SCALE(sharpenScale), GTK_POS_BOTTOM);
+    gtk_widget_set_size_request(sharpenScale, 200, -1);
+    gtk_range_set_value(GTK_RANGE(sharpenScale), 0.0);
+    gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenLabel, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenScale, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
-    GtkWidget *sharpenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(sharpenBox))->next->data);
     g_signal_connect(sharpenScale, "value-changed", G_CALLBACK(laplacianSharpen), previewBoxWithImage);
+
 
     // grayscale
     GtkWidget *grayscaleBox = scaleNeg50To50(GTK_ORIENTATION_HORIZONTAL, "Grayscale");

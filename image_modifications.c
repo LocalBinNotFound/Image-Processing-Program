@@ -4,7 +4,6 @@
 #include "function_buttons.h"
 #include <math.h>
 
-
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     static double previousScaleValue = 0.0;
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
@@ -155,26 +154,49 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
-// ?
-void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
-    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+
+void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
+    static double previousScaleValue = 0.0;
+    static GdkPixbuf *originalPixbuf = NULL;  // Keep track of the original image
+    PreviewBoxWithImage *previewBoxWithImage = (PreviewBoxWithImage *) imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to apply Laplacian sharpening!");
+        return;
+    }
+
+    double sharpenScale = gtk_range_get_value(GTK_RANGE(scale));
+    double sharpenFactor = pow(10, sharpenScale);  // Adjust the sharpening factor based on the scale
+
+    if (sharpenScale == previousScaleValue) {
+        // Undo the sharpening
+        if (originalPixbuf != NULL) {
+            g_object_unref(previewBoxWithImage->originalPixbuf);
+            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            updatePreviewBox(previewBoxWithImage);
+            g_message("Laplacian sharpening undone!");
+            previousScaleValue = 0.0;  // Reset the previous scale value
+        } else {
+            g_message("No image available to undo Laplacian sharpening!");
+        }
     } else {
-        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
-        GdkPixbuf* sharpenedPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        // Store the original image
+        if (originalPixbuf == NULL) {
+            originalPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
+        }
+
+        GdkPixbuf *sharpenedPixbuf = gdk_pixbuf_copy(originalPixbuf);
 
         int width = gdk_pixbuf_get_width(sharpenedPixbuf);
         int height = gdk_pixbuf_get_height(sharpenedPixbuf);
         int channels = gdk_pixbuf_get_n_channels(sharpenedPixbuf);
         int rowstride = gdk_pixbuf_get_rowstride(sharpenedPixbuf);
+        guint8 *pixels = gdk_pixbuf_get_pixels(sharpenedPixbuf);
 
-        guint8* pixels = gdk_pixbuf_get_pixels(sharpenedPixbuf);
-
+        // Apply the Laplacian sharpening filter
         double laplacianKernel[3][3] = {
                 {-1, -1, -1},
-                {-1, 9, -1},
+                {-1, 9,  -1},
                 {-1, -1, -1}
         };
 
@@ -184,24 +206,25 @@ void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
                     double sum = 0.0;
                     for (int i = -1; i <= 1; ++i) {
                         for (int j = -1; j <= 1; ++j) {
-                            guint8* pixel = pixels + (y + i) * rowstride + (x + j) * channels + c;
+                            guint8 *pixel = pixels + (y + i) * rowstride + (x + j) * channels + c;
                             double value = *pixel * laplacianKernel[i + 1][j + 1];
                             sum += value;
                         }
                     }
-                    guint8* sharpenedPixel = pixels + y * rowstride + x * channels + c;
-                    *sharpenedPixel = (guint8)fmax(fmin(sum, 255), 0);
+                    guint8 *sharpenedPixel = pixels + y * rowstride + x * channels + c;
+                    *sharpenedPixel = (guint8) fmin(fmax(*sharpenedPixel + sharpenFactor * sum, 0), 255);
                 }
             }
         }
 
+        // Update the preview box with the sharpened image
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = sharpenedPixbuf;
-
         updatePreviewBox(previewBoxWithImage);
         g_message("Image sharpened using Laplacian filter!");
     }
 }
+
 
 void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
