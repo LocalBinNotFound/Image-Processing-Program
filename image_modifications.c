@@ -4,44 +4,57 @@
 #include "function_buttons.h"
 #include <math.h>
 
+
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
+    static double previousScaleValue = 0.0;
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to adjust brightness!");
     } else {
         GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
-        int brightnessValue = gtk_range_get_value(GTK_RANGE(scale));
+        double scaleValue = gtk_range_get_value(GTK_RANGE(scale));
+        double scaleChange = scaleValue - previousScaleValue;
+
         GdkPixbuf *brightPixbuf = gdk_pixbuf_copy(originalPixbuf);
 
         int width = gdk_pixbuf_get_width(brightPixbuf);
         int height = gdk_pixbuf_get_height(brightPixbuf);
         int channels = gdk_pixbuf_get_n_channels(brightPixbuf);
         int rowstride = gdk_pixbuf_get_rowstride(brightPixbuf);
-
         guint8 *startPixel = gdk_pixbuf_get_pixels(brightPixbuf);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 guint8 *pixel = startPixel + y * rowstride + x * channels;
 
                 for (int c = 0; c < channels; c++) {
-                    int newValue = pixel[c] + brightnessValue;
-                    if (newValue < 0)
-                        newValue = 0;
-                    else if (newValue > 255)
-                        newValue = 255;
-                    pixel[c] = newValue;
+                    if (c != channels - 1) {
+                        double newValue = pixel[c] + scaleChange;
+
+                        if (pixel[c] != 0 && pixel[c] != 255) {
+                            double clippedValue = newValue;
+                            if (clippedValue < 0)
+                                clippedValue = 0;
+                            else if (clippedValue > 255)
+                                clippedValue = 255;
+                            if (clippedValue != pixel[c]) {
+                                pixel[c] = clippedValue;
+                            }
+                        }
+                    }
                 }
             }
         }
-
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = brightPixbuf;
 
         updatePreviewBox(previewBoxWithImage);
         g_message("Image brightness adjusted!");
+
+        previousScaleValue = scaleValue;
     }
 }
+
 
 void adjustContrast(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;

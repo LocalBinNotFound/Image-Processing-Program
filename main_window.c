@@ -2,7 +2,21 @@
 #include "function_buttons.h"
 #include "image_modifications.h"
 
-GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
+GtkWidget* scaleNeg50To50(GtkOrientation orientation, const gchar* title) {
+    GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget* titleLabel = gtk_label_new(title);
+    GtkWidget* scale = gtk_scale_new_with_range(orientation, -50.0, 50.0, 1.0);
+    gtk_scale_set_draw_value(GTK_SCALE(scale), TRUE);
+    gtk_scale_set_has_origin(GTK_SCALE(scale), TRUE);
+    gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_BOTTOM);
+    gtk_widget_set_size_request(scale, 200, -1);
+    gtk_range_set_value(GTK_RANGE(scale), 0.0);
+    gtk_box_pack_start(GTK_BOX(box), titleLabel, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box), scale, TRUE, TRUE, 0);
+    return box;
+}
+
+GtkWidget* scale0To100(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
     GtkWidget* scale = gtk_scale_new_with_range(orientation, 0.0, 100.0, 1.0);
@@ -10,7 +24,7 @@ GtkWidget* scaleBarBox(GtkOrientation orientation, const gchar* title) {
     gtk_scale_set_has_origin(GTK_SCALE(scale), TRUE);
     gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_BOTTOM);
     gtk_widget_set_size_request(scale, 200, -1);
-    gtk_range_set_value(GTK_RANGE(scale), 50.0);
+    gtk_range_set_value(GTK_RANGE(scale), 0.0);
     gtk_box_pack_start(GTK_BOX(box), titleLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), scale, TRUE, TRUE, 0);
     return box;
@@ -120,33 +134,31 @@ int main(int argc, char *argv[]) {
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     //brightness
-    GtkWidget *brightnessBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Brightness");
+    GtkWidget *brightnessBox = scaleNeg50To50(GTK_ORIENTATION_HORIZONTAL, "Brightness");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), brightnessBox, FALSE, FALSE, 0);
     GtkWidget *brightnessScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(brightnessBox))->next->data);
     g_signal_connect(brightnessScale, "value-changed", G_CALLBACK(adjustBrightness), previewBoxWithImage);
 
     // contrast
-    GtkWidget *contrastBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Contrast");
+    GtkWidget *contrastBox = scaleNeg50To50(GTK_ORIENTATION_HORIZONTAL, "Contrast");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), contrastBox, FALSE, FALSE, 0);
     GtkWidget *contrastScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(contrastBox))->next->data);
     g_signal_connect(contrastScale, "value-changed", G_CALLBACK(adjustContrast), NULL);
 
     // soften
-    GtkWidget *softenBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Blur");
+    GtkWidget *softenBox = scale0To100(GTK_ORIENTATION_HORIZONTAL, "Blur");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
     GtkWidget *softenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(softenBox))->next->data);
-    gtk_range_set_value(GTK_RANGE(softenScale), 0.0);
     g_signal_connect(softenScale, "value-changed", G_CALLBACK(gaussianBlur), NULL);
 
     // sharpen
-    GtkWidget *sharpenBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Sharpen");
+    GtkWidget *sharpenBox = scale0To100(GTK_ORIENTATION_HORIZONTAL, "Sharpen");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
     GtkWidget *sharpenScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(sharpenBox))->next->data);
-    gtk_range_set_value(GTK_RANGE(sharpenScale), 0.0);
     g_signal_connect(sharpenScale, "value-changed", G_CALLBACK(laplacianSharpen), NULL);
 
     // grayscale
-    GtkWidget *grayscaleBox = scaleBarBox(GTK_ORIENTATION_HORIZONTAL, "Grayscale");
+    GtkWidget *grayscaleBox = scaleNeg50To50(GTK_ORIENTATION_HORIZONTAL, "Grayscale");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), grayscaleBox, FALSE, FALSE, 0);
     GtkWidget *grayscaleScale = GTK_WIDGET(gtk_container_get_children(GTK_CONTAINER(grayscaleBox))->next->data);
     g_signal_connect(grayscaleScale, "value-changed", G_CALLBACK(adjustGrayscale), NULL);
@@ -200,7 +212,7 @@ int main(int argc, char *argv[]) {
     // invert color
     GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
-    /********/g_signal_connect(invertColorButton, "clicked", G_CALLBACK(adjustGrayscale), previewBoxWithImage);
+    /********/g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
 
     /*
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
