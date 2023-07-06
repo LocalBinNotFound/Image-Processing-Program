@@ -40,8 +40,8 @@ void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage) {
     }
 }
 
-void openButtonClicked(GtkWidget *button, gpointer data) {
-    PreviewBoxWithImage *previewBoxWithImage = data;
+void openButtonClicked(GtkWidget *button, gpointer imageFile) {
+    PreviewBoxWithImage *previewBoxWithImage = imageFile;
     gint res;
 
     GtkWidget *fileChooser = gtk_file_chooser_dialog_new("Open File",
@@ -79,8 +79,8 @@ void openButtonClicked(GtkWidget *button, gpointer data) {
     gtk_widget_destroy(fileChooser);
 }
 
-void saveButtonClicked(GtkWidget *button, gpointer data) {
-    PreviewBoxWithImage *previewBoxWithImage = data;
+void saveButtonClicked(GtkWidget *button, gpointer imageFile) {
+    PreviewBoxWithImage *previewBoxWithImage = imageFile;
     GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
     GtkWidget *dialog;
     GtkFileChooser *chooser;
@@ -115,4 +115,25 @@ void saveButtonClicked(GtkWidget *button, gpointer data) {
         g_free(filename);
     }
     gtk_widget_destroy(dialog);
+}
+
+void clearButtonClicked(GtkWidget *button, gpointer imageFile) {
+    PreviewBoxWithImage *previewBoxWithImage = imageFile;
+
+    if (previewBoxWithImage != NULL) {
+        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+
+        if (originalPixbuf != NULL) {
+            g_object_unref(originalPixbuf);
+            previewBoxWithImage->originalPixbuf = NULL;
+        }
+        if (previewBoxWithImage->previewImageWidget != NULL) {
+            gtk_container_remove(GTK_CONTAINER(previewBoxWithImage->previewBox),
+                                 previewBoxWithImage->previewImageWidget);
+            previewBoxWithImage->previewImageWidget = NULL;
+        }
+
+        updatePreviewBox(previewBoxWithImage);
+
+    }
 }
