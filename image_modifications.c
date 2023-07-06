@@ -22,23 +22,29 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
         int channels = gdk_pixbuf_get_n_channels(brightPixbuf);
         int rowstride = gdk_pixbuf_get_rowstride(brightPixbuf);
         guint8 *startPixel = gdk_pixbuf_get_pixels(brightPixbuf);
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 guint8 *pixel = startPixel + y * rowstride + x * channels;
                 for (int c = 0; c < channels; c++) {
                     if (c != channels - 1) {
                         double newValue = pixel[c] + brightnessChange;
-                        if (pixel[c] != 0 && pixel[c] != 255) {
-                            if (newValue < 0)
-                                newValue = 0;
-                            else if (newValue > 255)
-                                newValue = 255;
-                            pixel[c] = newValue;
-                            }
-                        }
+                        double minPixelValue = 0.0;
+                        double maxPixelValue = 255.0;
+                        // Adjust the new value within the valid range
+                        if (newValue < minPixelValue)
+                            newValue = minPixelValue;
+                        else if (newValue > maxPixelValue)
+                            newValue = maxPixelValue;
+
+                        // Scale the new value to the original dynamic range
+                        double originalRange = maxPixelValue - minPixelValue;
+                        double normalizedValue = (newValue - minPixelValue) / originalRange;
+                        pixel[c] = (guint8)(normalizedValue * maxPixelValue);
                     }
                 }
             }
+        }
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = brightPixbuf;
 
@@ -93,7 +99,7 @@ void adjustContrast(GtkWidget* scale, gpointer imageFile) {
 }
 
 void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
-    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to blur!");
@@ -107,22 +113,22 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
 
         guint8* pixels = gdk_pixbuf_get_pixels(blurredPixbuf);
 
-        double sigma = 5.0;  // Adjust the sigma value for desired blurring effect
-        int kernelSize = 3;  // Adjust the kernel size for desired blurring effect
+        double sigma = gtk_range_get_value(GTK_RANGE(scale))/20;
+        int kernelSize = 3;
 
-        double kernel[kernelSize][kernelSize];
+        double gaussianKernel[kernelSize][kernelSize];
         double sum = 0.0;
         int radius = kernelSize / 2;
         for (int x = -radius; x <= radius; ++x) {
             for (int y = -radius; y <= radius; ++y) {
                 double value = exp(-(x * x + y * y) / (2 * sigma * sigma));
-                kernel[x + radius][y + radius] = value;
+                gaussianKernel[x + radius][y + radius] = value;
                 sum += value;
             }
         }
         for (int i = 0; i < kernelSize; ++i) {
             for (int j = 0; j < kernelSize; ++j) {
-                kernel[i][j] /= sum;
+                gaussianKernel[i][j] /= sum;
             }
         }
         for (int y = radius; y < height - radius; ++y) {
@@ -132,7 +138,7 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
                     for (int i = -radius; i <= radius; ++i) {
                         for (int j = -radius; j <= radius; ++j) {
                             guint8* pixel = pixels + (y + i) * rowstride + (x + j) * channels + c;
-                            double value = *pixel * kernel[i + radius][j + radius];
+                            double value = *pixel * gaussianKernel[i + radius][j + radius];
                             sum += value;
                         }
                     }
@@ -210,8 +216,6 @@ void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
                 }
             }
         }
-
-        // Update the preview box with the sharpened image
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = sharpenedPixbuf;
         updatePreviewBox(previewBoxWithImage);

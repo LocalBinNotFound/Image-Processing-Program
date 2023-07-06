@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
     // sharpen
     GtkWidget *sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *sharpenLabel = gtk_label_new("Sharpen");
-    GtkWidget *sharpenScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 1.0, 0.1);
+    GtkWidget *sharpenScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 10);
     gtk_scale_set_draw_value(GTK_SCALE(sharpenScale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(sharpenScale), TRUE);
     gtk_scale_set_value_pos(GTK_SCALE(sharpenScale), GTK_POS_BOTTOM);
