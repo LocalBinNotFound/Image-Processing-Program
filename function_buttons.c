@@ -132,8 +132,6 @@ void clearButtonClicked(GtkWidget *button, gpointer imageFile) {
                                  previewBoxWithImage->previewImageWidget);
             previewBoxWithImage->previewImageWidget = NULL;
         }
-
         updatePreviewBox(previewBoxWithImage);
-
     }
 }
