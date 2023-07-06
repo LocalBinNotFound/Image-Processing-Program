@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.00)
 project(Image_Wicked C)
 
-find_package(OpenCV REQUIRED)
 find_package(GTK REQUIRED)
 
 set(CMAKE_C_STANDARD 11)
