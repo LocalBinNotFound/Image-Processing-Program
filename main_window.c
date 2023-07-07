@@ -282,9 +282,10 @@ int main(int argc, char *argv[]) {
     GtkWidget *gScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(gBox)), 1));
     GtkWidget *bScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(bBox)), 1));
     setRGBScales(rScale, gScale, bScale);
-    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustRGB), NULL);
-    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), NULL);
-    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), NULL);
+    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
+    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
+    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
+
 
     // mirror
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
