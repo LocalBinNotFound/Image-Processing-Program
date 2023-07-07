@@ -2,6 +2,7 @@
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
 #include "function_buttons.h"
+#include "image_modifications.h"
 #include <math.h>
 
 const double minPixelValue = 0.0;
@@ -428,9 +429,76 @@ void mirrorImageLeftRight() {
 }
 
 
-// need to implement
-void adjustRGB() {
+void adjustRGB(GtkWidget* redScale, GtkWidget* greenScale, GtkWidget* blueScale, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust RGB!");
+        return;
+    }
+
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    GdkPixbuf* adjustedPixbuf = gdk_pixbuf_copy(originalPixbuf);
+    GdkPixbuf* tempPixbuf = gdk_pixbuf_copy(originalPixbuf);
+
+    int width = gdk_pixbuf_get_width(adjustedPixbuf);
+    int height = gdk_pixbuf_get_height(adjustedPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(adjustedPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(adjustedPixbuf);
+    guint8* pixels = gdk_pixbuf_get_pixels(adjustedPixbuf);
+    guint8* tempPixels = gdk_pixbuf_get_pixels(tempPixbuf);
+
+    double maxRed = 0.0;
+    double maxGreen = 0.0;
+    double maxBlue = 0.0;
+
+    // Find the maximum RGB values in the original image
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            guint8* pixel = pixels + y * rowstride + x * channels;
+            if (pixel[0] > maxRed)
+                maxRed = pixel[0];
+            if (pixel[1] > maxGreen)
+                maxGreen = pixel[1];
+            if (pixel[2] > maxBlue)
+                maxBlue = pixel[2];
+        }
+    }
+
+    // Set the maximum values on the RGB scale bars
+    GtkRange* redRange = GTK_RANGE(redScale);
+    GtkRange* greenRange = GTK_RANGE(greenScale);
+    GtkRange* blueRange = GTK_RANGE(blueScale);
+
+    gtk_range_set_adjustment(redRange, gtk_adjustment_new(0.0, 0.0, maxRed, 1.0, 1.0, 0.0));
+    gtk_range_set_adjustment(greenRange, gtk_adjustment_new(0.0, 0.0, maxGreen, 1.0, 1.0, 0.0));
+    gtk_range_set_adjustment(blueRange, gtk_adjustment_new(0.0, 0.0, maxBlue, 1.0, 1.0, 0.0));
+
+    // Get the current values from the RGB scale bars
+    double redValue = gtk_range_get_value(redRange);
+    double greenValue = gtk_range_get_value(greenRange);
+    double blueValue = gtk_range_get_value(blueRange);
+
+    // Adjust the RGB values based on the scales
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            guint8* pixel = pixels + y * rowstride + x * channels;
+            guint8* tempPixel = tempPixels + y * rowstride + x * channels;
+
+            tempPixel[0] = (guint8)(pixel[0] * (redValue / maxRed));
+            tempPixel[1] = (guint8)(pixel[1] * (greenValue / maxGreen));
+            tempPixel[2] = (guint8)(pixel[2] * (blueValue / maxBlue));
+        }
+    }
+
+    // Update the previewBoxWithImage structure
+    g_object_unref(previewBoxWithImage->tempPixbuf);
+    previewBoxWithImage->tempPixbuf = tempPixbuf;
+    updatePreviewBox(previewBoxWithImage);
+
+    g_message("Image RGB adjusted!");
 }
+
 
 void invertColor(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
@@ -464,6 +532,7 @@ void invertColor(GtkWidget* button, gpointer imageFile) {
         g_message("Image inverted successfully!");
     }
 }
+
 
 
 void adjustTransparency(GtkWidget *scale, gpointer imageFile) {

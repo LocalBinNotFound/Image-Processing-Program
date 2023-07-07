@@ -12,6 +12,7 @@ typedef struct previewBoxWithImage {
     GtkWidget* sigmaEntry;
     int softenKernelData;
     int sharpenKernelData;
+    gpointer tempPixbuf;
 } PreviewBoxWithImage;
 
 void setBrightnessScale(GtkWidget* scale);
@@ -25,3 +26,4 @@ void saveButtonClicked(GtkWidget *button, gpointer imageFile);
 void clearButtonClicked(GtkWidget *button, gpointer imageFile);
 
 #endif //IMAGE_PROCESSING_PROGRAM_UI_H
+
