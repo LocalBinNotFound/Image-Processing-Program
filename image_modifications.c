@@ -159,7 +159,7 @@ void gaussianBlur(GtkWidget* button, gpointer imageFile) {
 }
 
 
-void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
+void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
     static double previousScaleValue = 0.0;
     static GdkPixbuf *originalPixbuf = NULL;  // Keep track of the original image
     PreviewBoxWithImage *previewBoxWithImage = (PreviewBoxWithImage *) imageFile;
@@ -169,7 +169,7 @@ void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
         return;
     }
 
-    double sharpenScale = gtk_range_get_value(GTK_RANGE(scale));
+    double sharpenScale = gtk_range_get_value(GTK_RANGE(button));
     double sharpenFactor = pow(10, sharpenScale) * 0.1;  // Adjust the sharpening factor based on the scale
 
     if (sharpenScale == previousScaleValue) {
@@ -425,7 +425,7 @@ void mirrorImageLeftRight() {
 void adjustRGB() {
 }
 
-void invertColor(GtkWidget *scale, gpointer imageFile) {
+void invertColor(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
