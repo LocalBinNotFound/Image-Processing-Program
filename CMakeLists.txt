@@ -3,7 +3,7 @@ project(Image_Wicked C)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-pkg_check_modules(ImageMagick REQUIRED IMPORTED_TARGET MagickWand)
+#pkg_check_modules(ImageMagick REQUIRED IMPORTED_TARGET MagickWand)
 
 set(CMAKE_C_STANDARD 11)
 
