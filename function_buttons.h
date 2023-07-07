@@ -18,6 +18,7 @@ typedef struct previewBoxWithImage {
 void setBrightnessScale(GtkWidget* scale);
 void setContrastScale(GtkWidget* scale);
 void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue);
+void setGrayscaleScale(GtkWidget* scale);
 
 void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage);
 void openButtonClicked(GtkWidget *button, gpointer imageFile);

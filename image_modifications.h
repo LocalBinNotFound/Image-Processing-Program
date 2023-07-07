@@ -7,6 +7,7 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile);
 void adjustContrast(GtkWidget* scale, gpointer imageFile);
 void gaussianBlur(GtkWidget* button, gpointer imageFile);
 void laplacianSharpen(GtkWidget* button, gpointer imageFile);
+void turnIntoGrayscale(GtkWidget* button, gpointer imageFile);
 void adjustGrayscale(GtkWidget* scale, gpointer imageFile);
 void rotateByDegree();
 void mirrorImageUpDown();

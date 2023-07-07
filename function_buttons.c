@@ -11,6 +11,7 @@ GtkWidget* contrastScale;
 GtkWidget* redScale;
 GtkWidget* greenScale;
 GtkWidget* blueScale;
+GtkWidget* grayscaleScale;
 
 void setBrightnessScale(GtkWidget* scale) {
     brightnessScale = scale;
@@ -22,6 +23,9 @@ void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue) {
     redScale = red;
     greenScale = green;
     blueScale = blue;
+}
+void setGrayscaleScale(GtkWidget* scale) {
+    grayscaleScale = scale;
 }
 
 typedef struct previewBoxWithImage {
@@ -162,7 +166,7 @@ void clearButtonClicked(GtkWidget *button, gpointer imageFile) {
         gtk_range_set_value(GTK_RANGE(redScale), 0.0);
         gtk_range_set_value(GTK_RANGE(greenScale), 0.0);
         gtk_range_set_value(GTK_RANGE(blueScale), 0.0);
-
+        gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
         updatePreviewBox(previewBoxWithImage);
     }
 }

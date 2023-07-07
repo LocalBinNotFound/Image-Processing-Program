@@ -227,42 +227,36 @@ void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
 }
 
 
-void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
-    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+void turnIntoGrayscale(GtkWidget* button, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to convert to grayscale!");
     } else {
         GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
-        GdkPixbuf* grayscalePixbuf = gdk_pixbuf_copy(originalPixbuf);
-
-        int width = gdk_pixbuf_get_width(grayscalePixbuf);
-        int height = gdk_pixbuf_get_height(grayscalePixbuf);
-        int channels = gdk_pixbuf_get_n_channels(grayscalePixbuf);
-        int rowstride = gdk_pixbuf_get_rowstride(grayscalePixbuf);
-
-        guint8* pixels = gdk_pixbuf_get_pixels(grayscalePixbuf);
+        int width = gdk_pixbuf_get_width(originalPixbuf);
+        int height = gdk_pixbuf_get_height(originalPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+        guint8* pixels = gdk_pixbuf_get_pixels(originalPixbuf);
 
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 guint8* pixel = pixels + y * rowstride + x * channels;
-
-                // Calculate grayscale value
                 guint8 grayValue = (guint8)((pixel[0] + pixel[1] + pixel[2]) / 3);
-
-                // Set grayscale value for all color channels
                 for (int c = 0; c < channels; ++c) {
                     pixel[c] = grayValue;
                 }
             }
         }
-
-        g_object_unref(previewBoxWithImage->originalPixbuf);
-        previewBoxWithImage->originalPixbuf = grayscalePixbuf;
-
         updatePreviewBox(previewBoxWithImage);
         g_message("Image converted to grayscale!");
     }
+}
+
+
+void adjustGrayscale(GtkWidget* scale, gpointer imageFile) {
+
 }
 
 
