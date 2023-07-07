@@ -6,45 +6,45 @@
 
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     static double previousScaleValue = 0.0;
+    static GdkPixbuf *originalPixbuf = NULL;
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to adjust brightness!");
     } else {
-        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+        if (originalPixbuf == NULL) {
+            originalPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
+        }
+
+        GdkPixbuf *brightPixbuf = NULL;
         double brightnessValue = gtk_range_get_value(GTK_RANGE(scale));
-        double brightnessChange = brightnessValue - previousScaleValue;
+        double brightnessChange = (brightnessValue - previousScaleValue)*5;
 
-        GdkPixbuf *brightPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        if (brightnessValue == 0) {
+            brightPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        } else {
+            brightPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
+            int width = gdk_pixbuf_get_width(brightPixbuf);
+            int height = gdk_pixbuf_get_height(brightPixbuf);
+            int channels = gdk_pixbuf_get_n_channels(brightPixbuf);
+            int rowstride = gdk_pixbuf_get_rowstride(brightPixbuf);
+            guint8 *startPixel = gdk_pixbuf_get_pixels(brightPixbuf);
 
-        int width = gdk_pixbuf_get_width(brightPixbuf);
-        int height = gdk_pixbuf_get_height(brightPixbuf);
-        int channels = gdk_pixbuf_get_n_channels(brightPixbuf);
-        int rowstride = gdk_pixbuf_get_rowstride(brightPixbuf);
-        guint8 *startPixel = gdk_pixbuf_get_pixels(brightPixbuf);
-
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                guint8 *pixel = startPixel + y * rowstride + x * channels;
-                for (int c = 0; c < channels; c++) {
-                    if (c != channels - 1) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    guint8 *pixel = startPixel + y * rowstride + x * channels;
+                    for (int c = 0; c < channels; c++) {
                         double newValue = pixel[c] + brightnessChange;
-                        double minPixelValue = 0.0;
-                        double maxPixelValue = 255.0;
-                        // Adjust the new value within the valid range
-                        if (newValue < minPixelValue)
-                            newValue = minPixelValue;
-                        else if (newValue > maxPixelValue)
-                            newValue = maxPixelValue;
-
-                        // Scale the new value to the original dynamic range
-                        double originalRange = maxPixelValue - minPixelValue;
-                        double normalizedValue = (newValue - minPixelValue) / originalRange;
-                        pixel[c] = (guint8)(normalizedValue * maxPixelValue);
+                        if (newValue < 0)
+                            newValue = 0;
+                        else if (newValue > 255)
+                            newValue = 255;
+                        pixel[c] = (guint8)newValue;
                     }
                 }
             }
         }
+
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = brightPixbuf;
 
@@ -52,6 +52,7 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
         previousScaleValue = brightnessValue;
     }
 }
+
 
 void adjustContrast(GtkWidget* scale, gpointer imageFile) {
     static double previousScaleValue = 0.0;
