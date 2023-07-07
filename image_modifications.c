@@ -15,7 +15,6 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
         if (originalPixbuf == NULL) {
             originalPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
         }
-
         GdkPixbuf *brightPixbuf = NULL;
         double brightnessValue = gtk_range_get_value(GTK_RANGE(scale));
         double brightnessChange = (brightnessValue - previousScaleValue)*5;
@@ -44,7 +43,6 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
                 }
             }
         }
-
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = brightPixbuf;
 
