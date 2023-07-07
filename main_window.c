@@ -5,7 +5,7 @@
 GtkWidget* scaleNeg100To100(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
-    GtkWidget* scale = gtk_scale_new_with_range(orientation, -10.0, 10.0, 1.0);
+    GtkWidget* scale = gtk_scale_new_with_range(orientation, -100.0, 100.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(scale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(scale), TRUE);
     gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_BOTTOM);
