@@ -7,6 +7,8 @@ typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
+    GdkPixbuf *tempPixbuf;
+    double prevBrightnessScaleValue;
 } PreviewBoxWithImage;
 
 void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage);

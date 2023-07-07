@@ -98,6 +98,8 @@ int main(int argc, char *argv[]) {
     previewBoxWithImage->previewBox = previewBox;
     previewBoxWithImage->previewImageWidget = NULL;
     previewBoxWithImage->originalPixbuf = NULL;
+    previewBoxWithImage->tempPixbuf = NULL;
+    previewBoxWithImage->prevBrightnessScaleValue = 0.0;
 
     // overall layout
     GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);

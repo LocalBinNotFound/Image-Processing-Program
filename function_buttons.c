@@ -10,6 +10,8 @@ typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
+    GdkPixbuf *tempPixbuf;
+    double prevBrightnessScaleValue;
 } PreviewBoxWithImage;
 
 // call this function to update the preview image whenever originalPixbuf has been modified
@@ -71,6 +73,8 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
             GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
                                                                  8, width, height, rowstride, NULL, NULL);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
+            previewBoxWithImage->tempPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            previewBoxWithImage->prevBrightnessScaleValue = 0.0;
             stbi_image_free(image);
             updatePreviewBox(previewBoxWithImage);
         }
