@@ -6,12 +6,33 @@
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
 
+GtkWidget* brightnessScale;
+GtkWidget* contrastScale;
+GtkWidget* redScale;
+GtkWidget* greenScale;
+GtkWidget* blueScale;
+
+void setBrightnessScale(GtkWidget* scale) {
+    brightnessScale = scale;
+}
+void setContrastScale(GtkWidget* scale) {
+    contrastScale = scale;
+}
+void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue) {
+    redScale = red;
+    greenScale = green;
+    blueScale = blue;
+}
+
 typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
-    GdkPixbuf *tempPixbuf;
+    GdkPixbuf *adjustedPixbuf;
     double prevBrightnessScaleValue;
+    GtkWidget* sigmaEntry;
+    int softenKernelData;
+    int sharpenKernelData;
 } PreviewBoxWithImage;
 
 // call this function to update the preview image whenever originalPixbuf has been modified
@@ -73,7 +94,7 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
             GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
                                                                  8, width, height, rowstride, NULL, NULL);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
-            previewBoxWithImage->tempPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            previewBoxWithImage->adjustedPixbuf = gdk_pixbuf_copy(originalPixbuf);
             previewBoxWithImage->prevBrightnessScaleValue = 0.0;
             stbi_image_free(image);
             updatePreviewBox(previewBoxWithImage);
@@ -136,6 +157,12 @@ void clearButtonClicked(GtkWidget *button, gpointer imageFile) {
                                  previewBoxWithImage->previewImageWidget);
             previewBoxWithImage->previewImageWidget = NULL;
         }
+        gtk_range_set_value(GTK_RANGE(brightnessScale), 0.0);
+        gtk_range_set_value(GTK_RANGE(contrastScale), 0.0);
+        gtk_range_set_value(GTK_RANGE(redScale), 0.0);
+        gtk_range_set_value(GTK_RANGE(greenScale), 0.0);
+        gtk_range_set_value(GTK_RANGE(blueScale), 0.0);
+
         updatePreviewBox(previewBoxWithImage);
     }
 }

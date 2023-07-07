@@ -7,9 +7,16 @@ typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
-    GdkPixbuf *tempPixbuf;
+    GdkPixbuf *adjustedPixbuf;
     double prevBrightnessScaleValue;
+    GtkWidget* sigmaEntry;
+    int softenKernelData;
+    int sharpenKernelData;
 } PreviewBoxWithImage;
+
+void setBrightnessScale(GtkWidget* scale);
+void setContrastScale(GtkWidget* scale);
+void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue);
 
 void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage);
 void openButtonClicked(GtkWidget *button, gpointer imageFile);

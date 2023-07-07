@@ -14,23 +14,22 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
         g_message("No image available to adjust brightness!");
     } else {
         GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
-        GdkPixbuf *tempPixbuf = previewBoxWithImage->tempPixbuf;
+        GdkPixbuf *adjustedPixbuf = previewBoxWithImage->adjustedPixbuf;
         double previousScaleValue = previewBoxWithImage->prevBrightnessScaleValue;
 
         double brightnessValue = gtk_range_get_value(GTK_RANGE(scale));
-        GdkPixbuf *brightPixbuf = gdk_pixbuf_copy(originalPixbuf);
 
-        int width = gdk_pixbuf_get_width(brightPixbuf);
-        int height = gdk_pixbuf_get_height(brightPixbuf);
-        int channels = gdk_pixbuf_get_n_channels(brightPixbuf);
-        int rowstride = gdk_pixbuf_get_rowstride(brightPixbuf);
-        guint8 *startPixel = gdk_pixbuf_get_pixels(brightPixbuf);
-        guint8 *originStartPixel = gdk_pixbuf_get_pixels(tempPixbuf);
+        int width = gdk_pixbuf_get_width(originalPixbuf);
+        int height = gdk_pixbuf_get_height(originalPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+        guint8 *startPixel = gdk_pixbuf_get_pixels(originalPixbuf);
+        guint8 *adjustedStartPixel = gdk_pixbuf_get_pixels(adjustedPixbuf);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 guint8 *pixel = startPixel + y * rowstride + x * channels;
-                guint8 *originalPixel = originStartPixel + y * rowstride + x * channels;
+                guint8 *originalPixel = adjustedStartPixel + y * rowstride + x * channels;
                 for (int c = 0; c < channels; c++) {
                     if (c != channels - 1) {
                         double leftBound = originalPixel[c] * -1;
@@ -57,59 +56,35 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
                 }
             }
         }
-        g_object_unref(previewBoxWithImage->originalPixbuf);
-        previewBoxWithImage->originalPixbuf = brightPixbuf;
-
         updatePreviewBox(previewBoxWithImage);
         previewBoxWithImage->prevBrightnessScaleValue = brightnessValue;
     }
 }
 
 void adjustContrast(GtkWidget* scale, gpointer imageFile) {
-    static GdkPixbuf* originalPixbuf = NULL;  // Keep track of the original image
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to adjust contrast!");
-        return;
-    }
-
-    double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
-
-    if (contrastValue == 0.0) {
-        // Reset to the original image
-        if (originalPixbuf != NULL) {
-            g_object_unref(previewBoxWithImage->originalPixbuf);
-            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(originalPixbuf);
-            updatePreviewBox(previewBoxWithImage);
-        } else {
-            g_message("No image available to reset contrast!");
-        }
     } else {
-        if (originalPixbuf == NULL) {
-            // Store the original image
-            originalPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
-        }
-
-        GdkPixbuf* contrastPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
+        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
+        GdkPixbuf *adjustedPixbuf = previewBoxWithImage->adjustedPixbuf;
         double contrastChange = contrastValue / 100.0;
 
-        int width = gdk_pixbuf_get_width(contrastPixbuf);
-        int height = gdk_pixbuf_get_height(contrastPixbuf);
-        int channels = gdk_pixbuf_get_n_channels(contrastPixbuf);
-        int rowstride = gdk_pixbuf_get_rowstride(contrastPixbuf);
-        guint8* pixels = gdk_pixbuf_get_pixels(contrastPixbuf);
-
+        int width = gdk_pixbuf_get_width(originalPixbuf);
+        int height = gdk_pixbuf_get_height(originalPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+        guint8 *pixels = gdk_pixbuf_get_pixels(originalPixbuf);
         guint8 rgbThreshold = 127;
-        double contrast = contrastChange;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                guint8* pixel = pixels + y * rowstride + x * channels;
-
+                guint8 *pixel = pixels + y * rowstride + x * channels;
                 for (int c = 0; c < channels; c++) {
                     double pixelValue = pixel[c];
-                    double adjustedValue = pixelValue + (pixelValue - rgbThreshold) * contrast;
+                    double adjustedValue = pixelValue + (pixelValue - rgbThreshold) * contrastChange;
                     if (adjustedValue < 0)
                         adjustedValue = 0;
                     else if (adjustedValue > 255)
@@ -118,15 +93,15 @@ void adjustContrast(GtkWidget* scale, gpointer imageFile) {
                 }
             }
         }
-
-        g_object_unref(previewBoxWithImage->originalPixbuf);
-        previewBoxWithImage->originalPixbuf = contrastPixbuf;
+        GdkPixbuf* tempPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        g_object_unref(previewBoxWithImage->adjustedPixbuf);
+        previewBoxWithImage->adjustedPixbuf = tempPixbuf;
         updatePreviewBox(previewBoxWithImage);
     }
 }
 
 
-void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
+void gaussianBlur(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
@@ -141,8 +116,9 @@ void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
 
         guint8* pixels = gdk_pixbuf_get_pixels(blurredPixbuf);
 
-        double sigma = gtk_range_get_value(GTK_RANGE(scale))/20;
-        int kernelSize = 3;
+        const gchar* sigmaStr = gtk_entry_get_text(GTK_ENTRY(previewBoxWithImage->sigmaEntry));
+        double sigma = g_ascii_strtod(sigmaStr, NULL);
+        int kernelSize = previewBoxWithImage->softenKernelData;
 
         double gaussianKernel[kernelSize][kernelSize];
         double sum = 0.0;
