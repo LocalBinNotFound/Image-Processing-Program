@@ -18,12 +18,12 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
         double previousScaleValue = previewBoxWithImage->prevBrightnessScaleValue;
 
         double brightnessValue = gtk_range_get_value(GTK_RANGE(scale));
-
-        int width = gdk_pixbuf_get_width(originalPixbuf);
-        int height = gdk_pixbuf_get_height(originalPixbuf);
-        int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
-        int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
-        guint8 *startPixel = gdk_pixbuf_get_pixels(originalPixbuf);
+        GdkPixbuf* brightPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        int width = gdk_pixbuf_get_width(brightPixbuf);
+        int height = gdk_pixbuf_get_height(brightPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(brightPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(brightPixbuf);
+        guint8 *startPixel = gdk_pixbuf_get_pixels(brightPixbuf);
         guint8 *adjustedStartPixel = gdk_pixbuf_get_pixels(adjustedPixbuf);
 
         for (int y = 0; y < height; y++) {
@@ -56,35 +56,59 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
                 }
             }
         }
+        g_object_unref(originalPixbuf);
+        previewBoxWithImage->originalPixbuf = brightPixbuf;
         updatePreviewBox(previewBoxWithImage);
+
         previewBoxWithImage->prevBrightnessScaleValue = brightnessValue;
     }
 }
 
 void adjustContrast(GtkWidget* scale, gpointer imageFile) {
+    static GdkPixbuf* originalPixbuf = NULL;  // Keep track of the original image
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to adjust contrast!");
+        return;
+    }
+
+    double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
+
+    if (contrastValue == 0.0) {
+        // Reset to the original image
+        if (originalPixbuf != NULL) {
+            g_object_unref(previewBoxWithImage->originalPixbuf);
+            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            updatePreviewBox(previewBoxWithImage);
+        } else {
+            g_message("No image available to reset contrast!");
+        }
     } else {
-        double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
-        GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;
-        GdkPixbuf *adjustedPixbuf = previewBoxWithImage->adjustedPixbuf;
+        if (originalPixbuf == NULL) {
+            // Store the original image
+            originalPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
+        }
+
+        GdkPixbuf* contrastPixbuf = gdk_pixbuf_copy(originalPixbuf);
         double contrastChange = contrastValue / 100.0;
 
-        int width = gdk_pixbuf_get_width(originalPixbuf);
-        int height = gdk_pixbuf_get_height(originalPixbuf);
-        int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
-        int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
-        guint8 *pixels = gdk_pixbuf_get_pixels(originalPixbuf);
+        int width = gdk_pixbuf_get_width(contrastPixbuf);
+        int height = gdk_pixbuf_get_height(contrastPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(contrastPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(contrastPixbuf);
+        guint8* pixels = gdk_pixbuf_get_pixels(contrastPixbuf);
+
         guint8 rgbThreshold = 127;
+        double contrast = contrastChange;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                guint8 *pixel = pixels + y * rowstride + x * channels;
+                guint8* pixel = pixels + y * rowstride + x * channels;
+
                 for (int c = 0; c < channels; c++) {
                     double pixelValue = pixel[c];
-                    double adjustedValue = pixelValue + (pixelValue - rgbThreshold) * contrastChange;
+                    double adjustedValue = pixelValue + (pixelValue - rgbThreshold) * contrast;
                     if (adjustedValue < 0)
                         adjustedValue = 0;
                     else if (adjustedValue > 255)
@@ -93,7 +117,10 @@ void adjustContrast(GtkWidget* scale, gpointer imageFile) {
                 }
             }
         }
-        GdkPixbuf* tempPixbuf = gdk_pixbuf_copy(originalPixbuf);
+
+        g_object_unref(previewBoxWithImage->originalPixbuf);
+        previewBoxWithImage->originalPixbuf = contrastPixbuf;
+        GdkPixbuf* tempPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
         g_object_unref(previewBoxWithImage->adjustedPixbuf);
         previewBoxWithImage->adjustedPixbuf = tempPixbuf;
         updatePreviewBox(previewBoxWithImage);
@@ -350,24 +377,10 @@ void rotateByDegree(int degree, gpointer imageFile) {
     }
 }
 
-PreviewBoxWithImage* getPreviewBoxImage(GtkWidget* previewBox) {
-    // Cast the widget to a GtkImage
-    GtkImage* image = GTK_IMAGE(previewBox);
-
-    // Get the Pixbuf from the GtkImage
-    GdkPixbuf* pixbuf = gtk_image_get_pixbuf(image);
-
-    // Create a new PreviewBoxWithImage structure
-    PreviewBoxWithImage* previewBoxWithImage = malloc(sizeof(PreviewBoxWithImage));
-    previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(pixbuf);
-
-    return previewBoxWithImage;
-}
-
 // need to implement
-void mirrorImageUpDown(GtkWidget* previewBox) {
+void mirrorImageUpDown(GtkWidget* previewBox, gpointer imageFile) {
     // Retrieve the original image from the preview box
-    PreviewBoxWithImage* previewBoxWithImage = getPreviewBoxImage(previewBox);
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to mirror!");
