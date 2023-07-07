@@ -283,8 +283,9 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(grayscaleBox), grayscaleScale, FALSE, FALSE,0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), grayscaleBox, FALSE, FALSE, 0);
     setGrayscaleScale(grayscaleScale);
-    g_signal_connect(grayscaleScale, "value-changed", G_CALLBACK(adjustGrayscale), NULL);
-    g_signal_connect(turnGrayscaleButton, "clicked", G_CALLBACK(adjustGrayscale), NULL);
+    g_signal_connect(turnGrayscaleButton, "clicked", G_CALLBACK(turnIntoGrayscale), previewBoxWithImage);
+    g_signal_connect(grayscaleScale, "value-changed", G_CALLBACK(adjustGrayscale), previewBoxWithImage);
+
 
 
     // rgb
