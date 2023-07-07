@@ -194,7 +194,7 @@ void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
     }
 
     double sharpenScale = gtk_range_get_value(GTK_RANGE(scale));
-    double sharpenFactor = pow(10, sharpenScale);  // Adjust the sharpening factor based on the scale
+    double sharpenFactor = pow(10, sharpenScale) * 0.1;  // Adjust the sharpening factor based on the scale
 
     if (sharpenScale == previousScaleValue) {
         // Undo the sharpening
@@ -204,8 +204,6 @@ void laplacianSharpen(GtkWidget* scale, gpointer imageFile) {
             updatePreviewBox(previewBoxWithImage);
             g_message("Laplacian sharpening undone!");
             previousScaleValue = 0.0;  // Reset the previous scale value
-        } else {
-            g_message("No image available to undo Laplacian sharpening!");
         }
     } else {
         // Store the original image
