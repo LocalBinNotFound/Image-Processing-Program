@@ -145,7 +145,12 @@ void gaussianBlur(GtkWidget* button, gpointer imageFile) {
         guint8* pixels = gdk_pixbuf_get_pixels(blurredPixbuf);
 
         const gchar* sigmaStr = gtk_entry_get_text(GTK_ENTRY(previewBoxWithImage->sigmaEntry));
-        double sigma = g_ascii_strtod(sigmaStr, NULL);
+        double sigma;
+        if (strlen(sigmaStr) > 0) {
+            sigma = g_ascii_strtod(sigmaStr, NULL);
+        } else {
+            sigma = 1.0;
+        }
         int kernelSize = previewBoxWithImage->softenKernelData;
 
         double gaussianKernel[kernelSize][kernelSize];
