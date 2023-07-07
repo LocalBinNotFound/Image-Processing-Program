@@ -66,28 +66,46 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
 }
 
 void adjustContrast(GtkWidget* scale, gpointer imageFile) {
-    static double previousScaleValue = 0.0;
+    static GdkPixbuf* originalPixbuf = NULL;  // Keep track of the original image
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to adjust contrast!");
+        return;
+    }
+
+    double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
+
+    if (contrastValue == 0.0) {
+        // Reset to the original image
+        if (originalPixbuf != NULL) {
+            g_object_unref(previewBoxWithImage->originalPixbuf);
+            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            updatePreviewBox(previewBoxWithImage);
+        } else {
+            g_message("No image available to reset contrast!");
+        }
     } else {
-        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
-        double contrastValue = gtk_range_get_value(GTK_RANGE(scale));
-        double contrastChange = contrastValue - previousScaleValue;
-        int rgbThreshold = 127;
-        double contrast = (double) contrastChange / 100.0;
+        if (originalPixbuf == NULL) {
+            // Store the original image
+            originalPixbuf = gdk_pixbuf_copy(previewBoxWithImage->originalPixbuf);
+        }
+
         GdkPixbuf* contrastPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        double contrastChange = contrastValue / 100.0;
 
         int width = gdk_pixbuf_get_width(contrastPixbuf);
         int height = gdk_pixbuf_get_height(contrastPixbuf);
         int channels = gdk_pixbuf_get_n_channels(contrastPixbuf);
         int rowstride = gdk_pixbuf_get_rowstride(contrastPixbuf);
+        guint8* pixels = gdk_pixbuf_get_pixels(contrastPixbuf);
 
-        guint8* startPixel = gdk_pixbuf_get_pixels(contrastPixbuf);
+        guint8 rgbThreshold = 127;
+        double contrast = contrastChange;
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                guint8* pixel = startPixel + y * rowstride + x * channels;
+                guint8* pixel = pixels + y * rowstride + x * channels;
 
                 for (int c = 0; c < channels; c++) {
                     double pixelValue = pixel[c];
@@ -96,19 +114,17 @@ void adjustContrast(GtkWidget* scale, gpointer imageFile) {
                         adjustedValue = 0;
                     else if (adjustedValue > 255)
                         adjustedValue = 255;
-                    pixel[c] = (guint8)adjustedValue;
+                    pixel[c] = (guint8) adjustedValue;
                 }
             }
         }
 
         g_object_unref(previewBoxWithImage->originalPixbuf);
         previewBoxWithImage->originalPixbuf = contrastPixbuf;
-
         updatePreviewBox(previewBoxWithImage);
-        previousScaleValue = contrastValue;
-
     }
 }
+
 
 void gaussianBlur(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
