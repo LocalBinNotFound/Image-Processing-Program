@@ -5,7 +5,18 @@
 int selectedSoftenKernel = 3;
 int selectedSharpenKernel = 3;
 
-GtkWidget *create_circle_button(gint radius) {
+void resetImage(PreviewBoxWithImage* previewBoxWithImage) {
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        return;
+    }
+    if (previewBoxWithImage->adjustedPixbuf != NULL) {
+        g_object_unref(previewBoxWithImage->adjustedPixbuf);
+        previewBoxWithImage->adjustedPixbuf = NULL;
+    }
+    updatePreviewBox(previewBoxWithImage);
+}
+
+GtkWidget* createCircleButtons(gint radius) {
     GtkWidget *button = gtk_button_new();
 
     gint diameter = radius * 2;
@@ -111,6 +122,8 @@ GtkWidget* boxWithBorder(GtkWidget* content) {
     return framedBox;
 }
 
+
+
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
@@ -191,6 +204,7 @@ int main(int argc, char *argv[]) {
     GtkWidget* softenResetButton = gtk_button_new_with_label("Reset");
     gtk_box_pack_start(GTK_BOX(softenTitleBox), softenLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenTitleBox), softenResetButton, FALSE, FALSE, 0);
+    g_signal_connect(softenResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     gtk_box_set_homogeneous(GTK_BOX(softenTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(softenBox), softenTitleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
@@ -201,13 +215,13 @@ int main(int argc, char *argv[]) {
     GtkWidget* sigmaBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(sigmaBox), sigmaLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sigmaBox), sigmaEntry, FALSE, FALSE, 0);
-    gtk_entry_set_placeholder_text(GTK_ENTRY(sigmaEntry), "Range from 0.1 to 5.0");
-    GtkWidget* softenKernel1 = create_circle_button(5);
-    GtkWidget* softenKernel2 = create_circle_button(7);
-    GtkWidget* softenKernel3 = create_circle_button(9);
-    GtkWidget* softenKernel4 = create_circle_button(11);
-    GtkWidget* softenKernel5 = create_circle_button(13);
-    GtkWidget* softenKernel6 = create_circle_button(15);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(sigmaEntry), "0.1 to 5.0， default 1.0");
+    GtkWidget* softenKernel1 = createCircleButtons(5);
+    GtkWidget* softenKernel2 = createCircleButtons(7);
+    GtkWidget* softenKernel3 = createCircleButtons(9);
+    GtkWidget* softenKernel4 = createCircleButtons(11);
+    GtkWidget* softenKernel5 = createCircleButtons(13);
+    GtkWidget* softenKernel6 = createCircleButtons(15);
     g_object_set_data(G_OBJECT(softenKernel1), "kernel-size", GINT_TO_POINTER(5));
     g_object_set_data(G_OBJECT(softenKernel2), "kernel-size", GINT_TO_POINTER(9));
     g_object_set_data(G_OBJECT(softenKernel3), "kernel-size", GINT_TO_POINTER(13));
@@ -240,15 +254,16 @@ int main(int argc, char *argv[]) {
     GtkWidget* sharpenResetButton = gtk_button_new_with_label("Reset");
     gtk_box_pack_start(GTK_BOX(sharpenTitleBox), sharpenLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sharpenTitleBox), sharpenResetButton, FALSE, FALSE, 0);
+    g_signal_connect(sharpenResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     gtk_box_set_homogeneous(GTK_BOX(sharpenTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenTitleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
-    GtkWidget* sharpenKernel1 = create_circle_button(5);
-    GtkWidget* sharpenKernel2 = create_circle_button(7);
-    GtkWidget* sharpenKernel3 = create_circle_button(9);
-    GtkWidget* sharpenKernel4 = create_circle_button(11);
-    GtkWidget* sharpenKernel5 = create_circle_button(13);
-    GtkWidget* sharpenKernel6 = create_circle_button(15);
+    GtkWidget* sharpenKernel1 = createCircleButtons(5);
+    GtkWidget* sharpenKernel2 = createCircleButtons(7);
+    GtkWidget* sharpenKernel3 = createCircleButtons(9);
+    GtkWidget* sharpenKernel4 = createCircleButtons(11);
+    GtkWidget* sharpenKernel5 = createCircleButtons(13);
+    GtkWidget* sharpenKernel6 = createCircleButtons(15);
     GtkWidget* sharpenButtonsContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
     gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel1, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel2, FALSE, FALSE, 0);
@@ -267,6 +282,7 @@ int main(int argc, char *argv[]) {
     GtkWidget* grayscaleTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget* grayscaleTitleLabel = gtk_label_new("Grayscale");
     GtkWidget* grayscaleResetButton = gtk_button_new_with_label("Reset");
+    g_signal_connect(grayscaleResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     GtkWidget* grayscaleScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, -100.0, 100.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(grayscaleScale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(grayscaleScale), TRUE);
@@ -308,6 +324,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* mirrorTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget* mirrorResetButton = gtk_button_new_with_label("Reset");
+    g_signal_connect(mirrorResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     GtkWidget *mirrorUpDownButton = gtk_button_new_with_label("UP/DOWN");
     GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("LEFT/RIGHT");
@@ -332,6 +349,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *rotateLabel = gtk_label_new("Rotation by Degree");
     GtkWidget* rotateTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget* rotateResetButton = gtk_button_new_with_label("Reset");
+    g_signal_connect(rotateResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateResetButton, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(rotateTitleBox), TRUE);
