@@ -432,8 +432,52 @@ void mirrorImageUpDown(GtkWidget* previewBox) {
     g_message("Image mirrored vertically!");
 }
 
-// need to implement
-void mirrorImageLeftRight() {
+
+void mirrorImageLeftRight() {// Retrieve the original image from the preview box
+    PreviewBoxWithImage* previewBoxWithImage = getPreviewBoxImage(previewBox);
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to mirror!");
+        return;
+    }
+
+    // Retrieve the original pixbuf and its properties
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    int width = gdk_pixbuf_get_width(originalPixbuf);
+    int height = gdk_pixbuf_get_height(originalPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+
+    // Create a new pixbuf for the mirrored image
+    GdkPixbuf* mirroredPixbuf = gdk_pixbuf_copy(originalPixbuf);
+    guint8* pixels = gdk_pixbuf_get_pixels(mirroredPixbuf);
+
+    // Iterate over each row of pixels and mirror them horizontally
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width / 2; ++x) {
+            // Compute the corresponding column index for mirroring
+            int mirroredX = width - x - 1;
+
+            // Swap the pixel data between the original column and the mirrored column
+            guint8* originalPixel = pixels + y * rowstride + x * channels;
+            guint8* mirroredPixel = pixels + y * rowstride + mirroredX * channels;
+
+            for (int c = 0; c < channels; ++c) {
+                guint8 temp = originalPixel[c];
+                originalPixel[c] = mirroredPixel[c];
+                mirroredPixel[c] = temp;
+            }
+        }
+    }
+
+    // Update the originalPixbuf in the previewBoxWithImage structure with the mirrored image
+    g_object_unref(previewBoxWithImage->originalPixbuf);
+    previewBoxWithImage->originalPixbuf = mirroredPixbuf;
+
+    // Update the preview box with the mirrored image
+    updatePreviewBox(previewBoxWithImage);
+
+    g_message("Image mirrored horizontally!");
 }
 
 
