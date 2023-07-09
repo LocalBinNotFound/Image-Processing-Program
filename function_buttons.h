@@ -9,6 +9,9 @@ typedef struct previewBoxWithImage {
     GdkPixbuf *originalPixbuf;
     GdkPixbuf *adjustedPixbuf;
     double prevBrightnessScaleValue;
+    double prevR;
+    double prevG;
+    double prevB;
     GtkWidget* sigmaEntry;
     int softenKernelData;
     int sharpenKernelData;

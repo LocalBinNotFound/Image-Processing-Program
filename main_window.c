@@ -145,6 +145,9 @@ int main(int argc, char *argv[]) {
     previewBoxWithImage->originalPixbuf = NULL;
     previewBoxWithImage->adjustedPixbuf = NULL;
     previewBoxWithImage->prevBrightnessScaleValue = 0.0;
+    previewBoxWithImage->prevR = 0.0;
+    previewBoxWithImage->prevG = 0.0;
+    previewBoxWithImage->prevB = 0.0;
 
     // overall layout
     GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -315,9 +318,9 @@ int main(int argc, char *argv[]) {
     GtkWidget *gScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(gBox)), 1));
     GtkWidget *bScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(bBox)), 1));
     setRGBScales(rScale, gScale, bScale);
-    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
-    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
-    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustRGB), previewBoxWithImage);
+    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustR), previewBoxWithImage);
+    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustG), previewBoxWithImage);
+    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustB), previewBoxWithImage);
 
 
     // mirror

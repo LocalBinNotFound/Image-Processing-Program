@@ -12,7 +12,10 @@ void adjustGrayscale(GtkWidget* scale, gpointer imageFile);
 void rotateByDegree();
 void mirrorImageUpDown(GtkWidget* scale, gpointer imageFile);
 void mirrorImageLeftRight(GtkWidget* scale, gpointer imageFile);
-void adjustRGB(GtkWidget* redScale, GtkWidget* greenScale, GtkWidget* blueScale, gpointer imageFile);
+//void adjustRGB(GtkWidget* redScale, GtkWidget* greenScale, GtkWidget* blueScale, gpointer imageFile);
+void adjustR(GtkWidget* scale, gpointer imageFile);
+void adjustG(GtkWidget* scale, gpointer imageFile);
+void adjustB(GtkWidget* scale, gpointer imageFile);
 void invertColor(GtkWidget *button, gpointer imageFile);
 void adjustTransparency(GtkWidget *scale, gpointer imageFile);
 

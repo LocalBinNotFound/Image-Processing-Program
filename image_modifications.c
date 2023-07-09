@@ -31,29 +31,27 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
             for (int x = 0; x < width; x++) {
                 guint8 *pixel = startPixel + y * rowstride + x * channels;
                 guint8 *originalPixel = adjustedStartPixel + y * rowstride + x * channels;
-                for (int c = 0; c < channels; c++) {
-                    if (c != channels - 1) {
-                        double leftBound = originalPixel[c] * -1;
-                        double rightBound = 255 - originalPixel[c];
-                        double newValue;
-                        if (brightnessValue <= rightBound && brightnessValue >= leftBound) {
-                            double startPoint;
-                            if (previousScaleValue < leftBound) {
-                                startPoint = leftBound;
-                            } else if (previousScaleValue > rightBound) {
-                                startPoint = rightBound;
-                            } else {
-                                startPoint = previousScaleValue;
-                            }
-                            double brightnessChange = brightnessValue - startPoint;
-                            newValue = pixel[c] + brightnessChange;
-                        } else if (brightnessValue > rightBound) {
-                            newValue = maxPixelValue;
+                for (int c = 0; c < 3; c++) {
+                    double leftBound = originalPixel[c] * -1;
+                    double rightBound = 255 - originalPixel[c];
+                    double newValue;
+                    if (brightnessValue <= rightBound && brightnessValue >= leftBound) {
+                        double startPoint;
+                        if (previousScaleValue < leftBound) {
+                            startPoint = leftBound;
+                        } else if (previousScaleValue > rightBound) {
+                            startPoint = rightBound;
                         } else {
-                            newValue = minPixelValue;
+                            startPoint = previousScaleValue;
                         }
-                        pixel[c] = (guint8)newValue;
+                        double brightnessChange = brightnessValue - startPoint;
+                        newValue = pixel[c] + brightnessChange;
+                    } else if (brightnessValue > rightBound) {
+                        newValue = maxPixelValue;
+                    } else {
+                        newValue = minPixelValue;
                     }
+                    pixel[c] = (guint8)newValue;
                 }
             }
         }
@@ -478,6 +476,179 @@ void mirrorImageLeftRight(GtkWidget* scale, gpointer imageFile) {// Retrieve the
     updatePreviewBox(previewBoxWithImage);
 
     g_message("Image mirrored horizontally!");
+}
+
+void adjustR(GtkWidget* scale, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust RGB!");
+        return;
+    }
+
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    GdkPixbuf* adjustedPixbuf = previewBoxWithImage->adjustedPixbuf;
+    double previousR = previewBoxWithImage->prevR;
+
+    int width = gdk_pixbuf_get_width(originalPixbuf);
+    int height = gdk_pixbuf_get_height(originalPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+    guint8* pixels = gdk_pixbuf_get_pixels(originalPixbuf);
+    guint8* tempPixels = gdk_pixbuf_get_pixels(adjustedPixbuf);
+
+
+    // Get the current values from the RGB scale bars
+    double redValue = gtk_range_get_value(GTK_RANGE(scale));
+
+    // Adjust the RGB values based on the scales
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            guint8* pixel = pixels + y * rowstride + x * channels;
+            guint8* tempPixel = tempPixels + y * rowstride + x * channels;
+            double leftBound = tempPixel[0] * -1;
+            double rightBound = 255 - tempPixel[0];
+            double newValue;
+            if (redValue <= rightBound && redValue >= leftBound) {
+                double startPoint;
+                if (previousR < leftBound) {
+                    startPoint = leftBound;
+                } else if (previousR > rightBound) {
+                    startPoint = rightBound;
+                } else {
+                    startPoint = previousR;
+                }
+                double rChange = redValue - startPoint;
+                newValue = pixel[0] + rChange;
+            } else if (redValue > rightBound) {
+                newValue = maxPixelValue;
+            } else {
+                newValue = minPixelValue;
+            }
+            pixel[0] = (guint8)newValue;
+        }
+    }
+
+    // Update the previewBoxWithImage structure
+    previewBoxWithImage->prevR = redValue;
+    updatePreviewBox(previewBoxWithImage);
+
+    g_message("Image RGB adjusted!");
+}
+
+void adjustG(GtkWidget* scale, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust RGB!");
+        return;
+    }
+
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    GdkPixbuf* adjustedPixbuf = previewBoxWithImage->adjustedPixbuf;
+    double previousG = previewBoxWithImage->prevG;
+
+    int width = gdk_pixbuf_get_width(originalPixbuf);
+    int height = gdk_pixbuf_get_height(originalPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+    guint8* pixels = gdk_pixbuf_get_pixels(originalPixbuf);
+    guint8* tempPixels = gdk_pixbuf_get_pixels(adjustedPixbuf);
+
+    // Get the current values from the RGB scale bars
+    double greenValue = gtk_range_get_value(GTK_RANGE(scale));
+
+    // Adjust the RGB values based on the scales
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            guint8* pixel = pixels + y * rowstride + x * channels;
+            guint8* tempPixel = tempPixels + y * rowstride + x * channels;
+            double leftBound = tempPixel[1] * -1;
+            double rightBound = 255 - tempPixel[1];
+            double newValue;
+            if (greenValue <= rightBound && greenValue >= leftBound) {
+                double startPoint;
+                if (previousG < leftBound) {
+                    startPoint = leftBound;
+                } else if (previousG > rightBound) {
+                    startPoint = rightBound;
+                } else {
+                    startPoint = previousG;
+                }
+                double rChange = greenValue - startPoint;
+                newValue = pixel[1] + rChange;
+            } else if (greenValue > rightBound) {
+                newValue = maxPixelValue;
+            } else {
+                newValue = minPixelValue;
+            }
+            pixel[1] = (guint8)newValue;
+        }
+    }
+
+    // Update the previewBoxWithImage structure
+    previewBoxWithImage->prevG = greenValue;
+    updatePreviewBox(previewBoxWithImage);
+
+    g_message("Image RGB adjusted!");
+}
+
+void adjustB(GtkWidget* scale, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to adjust RGB!");
+        return;
+    }
+
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    GdkPixbuf* adjustedPixbuf = previewBoxWithImage->adjustedPixbuf;
+    double previousB = previewBoxWithImage->prevB;
+
+    int width = gdk_pixbuf_get_width(originalPixbuf);
+    int height = gdk_pixbuf_get_height(originalPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+    guint8* pixels = gdk_pixbuf_get_pixels(originalPixbuf);
+    guint8* tempPixels = gdk_pixbuf_get_pixels(adjustedPixbuf);
+
+
+    // Get the current values from the RGB scale bars
+    double blueValue = gtk_range_get_value(GTK_RANGE(scale));
+
+    // Adjust the RGB values based on the scales
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            guint8* pixel = pixels + y * rowstride + x * channels;
+            guint8* tempPixel = tempPixels + y * rowstride + x * channels;
+            double leftBound = tempPixel[2] * -1;
+            double rightBound = 255 - tempPixel[2];
+            double newValue;
+            if (blueValue <= rightBound && blueValue >= leftBound) {
+                double startPoint;
+                if (previousB < leftBound) {
+                    startPoint = leftBound;
+                } else if (previousB > rightBound) {
+                    startPoint = rightBound;
+                } else {
+                    startPoint = previousB;
+                }
+                double rChange = blueValue - startPoint;
+                newValue = pixel[2] + rChange;
+            } else if (blueValue > rightBound) {
+                newValue = maxPixelValue;
+            } else {
+                newValue = minPixelValue;
+            }
+            pixel[2] = (guint8)newValue;
+        }
+    }
+
+    // Update the previewBoxWithImage structure
+    previewBoxWithImage->prevB = blueValue;
+    updatePreviewBox(previewBoxWithImage);
+
+    g_message("Image RGB adjusted!");
 }
 
 
