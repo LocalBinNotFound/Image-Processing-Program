@@ -338,6 +338,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorUpDownButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
     gtk_box_set_spacing(GTK_BOX(mirrorButtonBox), 20);
+    g_signal_connect(mirrorUpDownButton, "clicked", G_CALLBACK(mirrorImageUpDown), previewBoxWithImage);
+    g_signal_connect(mirrorLeftRightButton, "clicked", G_CALLBACK(mirrorImageLeftRight), previewBoxWithImage);
     // need to connect buttons to functions
 
 

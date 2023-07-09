@@ -387,9 +387,9 @@ PreviewBoxWithImage* getPreviewBoxImage(GtkWidget* previewBox) {
 }
 
 // need to implement
-void mirrorImageUpDown(GtkWidget* previewBox) {
+void mirrorImageUpDown(GtkWidget* scale, gpointer imageFile) {
     // Retrieve the original image from the preview box
-    PreviewBoxWithImage* previewBoxWithImage = getPreviewBoxImage(previewBox);
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to mirror!");
@@ -433,8 +433,8 @@ void mirrorImageUpDown(GtkWidget* previewBox) {
 }
 
 
-void mirrorImageLeftRight() {// Retrieve the original image from the preview box
-    PreviewBoxWithImage* previewBoxWithImage = getPreviewBoxImage(previewBox);
+void mirrorImageLeftRight(GtkWidget* scale, gpointer imageFile) {// Retrieve the original image from the preview box
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
 
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to mirror!");
