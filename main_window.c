@@ -5,17 +5,6 @@
 int selectedSoftenKernel = 3;
 int selectedSharpenKernel = 3;
 
-void resetImage(PreviewBoxWithImage* previewBoxWithImage) {
-    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
-        return;
-    }
-    if (previewBoxWithImage->adjustedPixbuf != NULL) {
-        g_object_unref(previewBoxWithImage->adjustedPixbuf);
-        previewBoxWithImage->adjustedPixbuf = NULL;
-    }
-    updatePreviewBox(previewBoxWithImage);
-}
-
 GtkWidget* createCircleButtons(gint radius) {
     GtkWidget *button = gtk_button_new();
 
@@ -53,7 +42,6 @@ GtkWidget* scaleNeg100To100(GtkOrientation orientation, const gchar* title) {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* titleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget* titleLabel = gtk_label_new(title);
-    GtkWidget* resetButton = gtk_button_new_with_label("Reset");
     GtkWidget* scale = gtk_scale_new_with_range(orientation, -100.0, 100.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(scale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(scale), TRUE);
@@ -61,7 +49,6 @@ GtkWidget* scaleNeg100To100(GtkOrientation orientation, const gchar* title) {
     gtk_widget_set_size_request(scale, 200, -1);
     gtk_range_set_value(GTK_RANGE(scale), 0.0);
     gtk_box_pack_start(GTK_BOX(titleBox), titleLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(titleBox), resetButton, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(titleBox),TRUE);
     gtk_box_pack_start(GTK_BOX(box), titleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(box), scale, TRUE, TRUE, 0);
@@ -73,9 +60,7 @@ GtkWidget* tripleScaleBarBox(GtkOrientation orientation, const gchar* title) {
 
     GtkWidget* titleLabel = gtk_label_new(title);
     GtkWidget* titleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* resetButton = gtk_button_new_with_label("Reset");
     gtk_box_pack_start(GTK_BOX(titleBox), titleLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(titleBox), resetButton, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(titleBox), TRUE);
     GtkWidget* rBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget* gBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
@@ -178,6 +163,9 @@ int main(int argc, char *argv[]) {
     GtkWidget *saveButton = gtk_button_new_with_label("Save");
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), saveButton);
     g_signal_connect(saveButton, "clicked", G_CALLBACK(saveButtonClicked), previewBoxWithImage);
+    GtkWidget *resetButton = gtk_button_new_with_label("Reset");
+    gtk_container_add(GTK_CONTAINER(mainButtonsBox), resetButton);
+    g_signal_connect(resetButton, "clicked", G_CALLBACK(resetButtonClicked), previewBoxWithImage);
     GtkWidget *clearButton = gtk_button_new_with_label("Clear");
     gtk_container_add(GTK_CONTAINER(mainButtonsBox), clearButton);
     g_signal_connect(clearButton, "clicked", G_CALLBACK(clearButtonClicked), previewBoxWithImage);
@@ -204,10 +192,7 @@ int main(int argc, char *argv[]) {
     GtkWidget* softenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* softenLabel = gtk_label_new("Gaussian Blur");
     GtkWidget* softenTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* softenResetButton = gtk_button_new_with_label("Reset");
     gtk_box_pack_start(GTK_BOX(softenTitleBox), softenLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(softenTitleBox), softenResetButton, FALSE, FALSE, 0);
-    g_signal_connect(softenResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     gtk_box_set_homogeneous(GTK_BOX(softenTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(softenBox), softenTitleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
@@ -254,10 +239,7 @@ int main(int argc, char *argv[]) {
     GtkWidget* sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* sharpenLabel = gtk_label_new("Laplacian Sharpen");
     GtkWidget* sharpenTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* sharpenResetButton = gtk_button_new_with_label("Reset");
     gtk_box_pack_start(GTK_BOX(sharpenTitleBox), sharpenLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenTitleBox), sharpenResetButton, FALSE, FALSE, 0);
-    g_signal_connect(sharpenResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     gtk_box_set_homogeneous(GTK_BOX(sharpenTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenTitleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
@@ -284,8 +266,6 @@ int main(int argc, char *argv[]) {
     GtkWidget* grayscaleBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* grayscaleTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget* grayscaleTitleLabel = gtk_label_new("Grayscale");
-    GtkWidget* grayscaleResetButton = gtk_button_new_with_label("Reset");
-    g_signal_connect(grayscaleResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     GtkWidget* grayscaleScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, -100.0, 100.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(grayscaleScale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(grayscaleScale), TRUE);
@@ -295,7 +275,6 @@ int main(int argc, char *argv[]) {
     GtkWidget* turnGrayscaleButton = gtk_button_new_with_label("Turn to grayscale");
 
     gtk_box_pack_start(GTK_BOX(grayscaleTitleBox), grayscaleTitleLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(grayscaleTitleBox), grayscaleResetButton, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(grayscaleTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(grayscaleBox), grayscaleTitleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(grayscaleBox), turnGrayscaleButton, FALSE, FALSE, 0);
@@ -326,14 +305,11 @@ int main(int argc, char *argv[]) {
     // mirror
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* mirrorTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* mirrorResetButton = gtk_button_new_with_label("Reset");
-    g_signal_connect(mirrorResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     GtkWidget *mirrorUpDownButton = gtk_button_new_with_label("UP/DOWN");
     GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("LEFT/RIGHT");
     GtkWidget *mirrorLabel = gtk_label_new("Mirror Image");
     gtk_box_pack_start(GTK_BOX(mirrorTitleBox), mirrorLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(mirrorTitleBox), mirrorResetButton, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(mirrorTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), mirrorBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorTitleBox, FALSE, FALSE, 0);
@@ -353,10 +329,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *rotateRightButton = gtk_button_new_with_label("R");
     GtkWidget *rotateLabel = gtk_label_new("Rotation by Degree");
     GtkWidget* rotateTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* rotateResetButton = gtk_button_new_with_label("Reset");
-    g_signal_connect(rotateResetButton, "clicked", G_CALLBACK(resetImage), previewBoxWithImage);
     gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateLabel, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateResetButton, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(rotateTitleBox), TRUE);
     GtkWidget *rotateAngleTxtBox = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(rotateAngleTxtBox), "Enter rotation degree here");

@@ -27,6 +27,7 @@ void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage);
 void openButtonClicked(GtkWidget *button, gpointer imageFile);
 void saveButtonClicked(GtkWidget *button, gpointer imageFile);
 void clearButtonClicked(GtkWidget *button, gpointer imageFile);
+void resetButtonClicked(GtkWidget *button, gpointer imageFile);
 
 #endif //IMAGE_PROCESSING_PROGRAM_UI_H
 

@@ -33,6 +33,7 @@ typedef struct previewBoxWithImage {
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
     GdkPixbuf *adjustedPixbuf;
+    GdkPixbuf *preservedPixbuf;
     double prevBrightnessScaleValue;
     GtkWidget* sigmaEntry;
     int softenKernelData;
@@ -99,6 +100,7 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
                                                                  8, width, height, rowstride, NULL, NULL);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
             previewBoxWithImage->adjustedPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            previewBoxWithImage->preservedPixbuf = gdk_pixbuf_copy(originalPixbuf);
             previewBoxWithImage->prevBrightnessScaleValue = 0.0;
             stbi_image_free(image);
             updatePreviewBox(previewBoxWithImage);
@@ -169,4 +171,44 @@ void clearButtonClicked(GtkWidget *button, gpointer imageFile) {
         gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
         updatePreviewBox(previewBoxWithImage);
     }
+}
+
+
+void resetButtonClicked(GtkWidget *button, gpointer imageFile) {
+    PreviewBoxWithImage *previewBoxWithImage = imageFile;
+
+    if (previewBoxWithImage == NULL) {
+        g_message("Nothing to be reset!");
+        return;
+    }
+    GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                               GTK_DIALOG_MODAL,
+                                               GTK_MESSAGE_QUESTION,
+                                               GTK_BUTTONS_YES_NO,
+                                               "Are you sure you want to reset?");
+    gtk_window_set_title(GTK_WINDOW(dialog), "Warning!");
+
+    gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+    if (response == GTK_RESPONSE_YES) {
+        GdkPixbuf *preservedPixbuf = previewBoxWithImage->preservedPixbuf;
+        if (preservedPixbuf != NULL) {
+            if (previewBoxWithImage->originalPixbuf != NULL) {
+                g_object_unref(previewBoxWithImage->originalPixbuf);
+            }
+            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(preservedPixbuf);
+            if (previewBoxWithImage->adjustedPixbuf != NULL) {
+                g_object_unref(previewBoxWithImage->adjustedPixbuf);
+            }
+            previewBoxWithImage->adjustedPixbuf = gdk_pixbuf_copy(preservedPixbuf);
+            updatePreviewBox(previewBoxWithImage);
+            gtk_range_set_value(GTK_RANGE(brightnessScale), 0.0);
+            gtk_range_set_value(GTK_RANGE(contrastScale), 0.0);
+            gtk_range_set_value(GTK_RANGE(redScale), 0.0);
+            gtk_range_set_value(GTK_RANGE(greenScale), 0.0);
+            gtk_range_set_value(GTK_RANGE(blueScale), 0.0);
+            gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
+        }
+    }
+
+    gtk_widget_destroy(dialog);
 }
