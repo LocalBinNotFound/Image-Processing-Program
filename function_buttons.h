@@ -7,8 +7,10 @@ typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
-    GdkPixbuf *adjustedPixbuf;
+    GdkPixbuf *pixbufAdjustedByFunc;
+    GdkPixbuf *preservedPixbuf;
     double prevBrightnessScaleValue;
+    double prevContrastScaleValue;
     double prevR;
     double prevG;
     double prevB;

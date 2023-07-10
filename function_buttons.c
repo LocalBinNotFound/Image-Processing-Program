@@ -32,12 +32,17 @@ typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
-    GdkPixbuf *adjustedPixbuf;
+    GdkPixbuf *pixbufAdjustedByFunc;
     GdkPixbuf *preservedPixbuf;
     double prevBrightnessScaleValue;
+    double prevContrastScaleValue;
+    double prevR;
+    double prevG;
+    double prevB;
     GtkWidget* sigmaEntry;
     int softenKernelData;
     int sharpenKernelData;
+    gpointer tempPixbuf;
 } PreviewBoxWithImage;
 
 // call this function to update the preview image whenever originalPixbuf has been modified
@@ -99,7 +104,7 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
             GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
                                                                  8, width, height, rowstride, NULL, NULL);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
-            previewBoxWithImage->adjustedPixbuf = gdk_pixbuf_copy(originalPixbuf);
+            previewBoxWithImage->pixbufAdjustedByFunc = gdk_pixbuf_copy(originalPixbuf);
             previewBoxWithImage->preservedPixbuf = gdk_pixbuf_copy(originalPixbuf);
             previewBoxWithImage->prevBrightnessScaleValue = 0.0;
             stbi_image_free(image);
@@ -192,22 +197,18 @@ void resetButtonClicked(GtkWidget *button, gpointer imageFile) {
     if (response == GTK_RESPONSE_YES) {
         GdkPixbuf *preservedPixbuf = previewBoxWithImage->preservedPixbuf;
         if (preservedPixbuf != NULL) {
-            if (previewBoxWithImage->originalPixbuf != NULL) {
-                g_object_unref(previewBoxWithImage->originalPixbuf);
-            }
-            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(preservedPixbuf);
-            if (previewBoxWithImage->adjustedPixbuf != NULL) {
-                g_object_unref(previewBoxWithImage->adjustedPixbuf);
-            }
-            previewBoxWithImage->adjustedPixbuf = gdk_pixbuf_copy(preservedPixbuf);
-            updatePreviewBox(previewBoxWithImage);
             gtk_range_set_value(GTK_RANGE(brightnessScale), 0.0);
             gtk_range_set_value(GTK_RANGE(contrastScale), 0.0);
             gtk_range_set_value(GTK_RANGE(redScale), 0.0);
             gtk_range_set_value(GTK_RANGE(greenScale), 0.0);
             gtk_range_set_value(GTK_RANGE(blueScale), 0.0);
             gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
+            g_object_unref(previewBoxWithImage->originalPixbuf);
+            previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(preservedPixbuf);
+            g_object_unref(previewBoxWithImage->pixbufAdjustedByFunc);
+            previewBoxWithImage->pixbufAdjustedByFunc = gdk_pixbuf_copy(preservedPixbuf);
         }
+        updatePreviewBox(previewBoxWithImage);
     }
 
     gtk_widget_destroy(dialog);

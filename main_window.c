@@ -122,13 +122,13 @@ int main(int argc, char *argv[]) {
 
     // preview box
     GtkWidget *previewBox = gtk_event_box_new();
-    gtk_widget_set_size_request(previewBox, 600, 600);
+    gtk_widget_set_size_request(previewBox, 500, 800);
     GtkWidget *previewBoxWithBorder = boxWithBorder(previewBox);
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)malloc(sizeof(PreviewBoxWithImage));
     previewBoxWithImage->previewBox = previewBox;
     previewBoxWithImage->previewImageWidget = NULL;
     previewBoxWithImage->originalPixbuf = NULL;
-    previewBoxWithImage->adjustedPixbuf = NULL;
+    previewBoxWithImage->pixbufAdjustedByFunc = NULL;
     previewBoxWithImage->prevBrightnessScaleValue = 0.0;
     previewBoxWithImage->prevR = 0.0;
     previewBoxWithImage->prevG = 0.0;
