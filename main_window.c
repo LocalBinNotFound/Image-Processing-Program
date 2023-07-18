@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
     // preview box
     GtkWidget *previewBox = gtk_event_box_new();
-    gtk_widget_set_size_request(previewBox, 500, 800);
+    gtk_widget_set_size_request(previewBox, 400, 500);
     GtkWidget *previewBoxWithBorder = boxWithBorder(previewBox);
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)malloc(sizeof(PreviewBoxWithImage));
     previewBoxWithImage->previewBox = previewBox;
@@ -142,8 +142,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
-    gtk_box_set_homogeneous(GTK_BOX(leftFunctionBox), TRUE);
-    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),50);
+    gtk_box_set_spacing(GTK_BOX(leftFunctionBox),30);
+    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),40);
 
     // logo
     gchar *currentFolder = g_path_get_dirname(__FILE__);
@@ -222,7 +222,7 @@ int main(int argc, char *argv[]) {
     g_signal_connect(softenKernel4, "clicked", G_CALLBACK(softenKernelClicked), previewBoxWithImage);
     g_signal_connect(softenKernel5, "clicked", G_CALLBACK(softenKernelClicked), previewBoxWithImage);
     g_signal_connect(softenKernel6, "clicked", G_CALLBACK(softenKernelClicked), previewBoxWithImage);
-    GtkWidget* softenButtonsContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    GtkWidget* softenButtonsContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(softenButtonsContainer), softenKernel1, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenButtonsContainer), softenKernel2, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenButtonsContainer), softenKernel3, FALSE, FALSE, 0);
@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
     GtkWidget* sharpenKernel4 = createCircleButtons(11);
     GtkWidget* sharpenKernel5 = createCircleButtons(13);
     GtkWidget* sharpenKernel6 = createCircleButtons(15);
-    GtkWidget* sharpenButtonsContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+    GtkWidget* sharpenButtonsContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel1, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel2, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel3, FALSE, FALSE, 0);
@@ -344,7 +344,7 @@ int main(int argc, char *argv[]) {
 
     // invert color
     GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), invertColorButton, FALSE, FALSE, 0);
     /********/g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
 
     /*
