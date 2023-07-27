@@ -88,7 +88,6 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
 
             GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
                                                                  8, width, height, rowstride, NULL, NULL);
-            printf("%d", channels);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
             previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(originalPixbuf);
             previewBoxWithImage->preservedPixbuf = gdk_pixbuf_copy(originalPixbuf);
@@ -97,6 +96,18 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
             previewBoxWithImage->adjustments.r = 0.0;
             previewBoxWithImage->adjustments.g = 0.0;
             previewBoxWithImage->adjustments.b = 0.0;
+
+            char msg[100];
+            if (channels == 4) sprintf(msg, "This image has %d channels.", channels);
+            else sprintf(msg, "This image has %d channels!\nTransparency adjustment not available!", channels);
+            GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+                                                       GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                       GTK_MESSAGE_INFO,
+                                                       GTK_BUTTONS_OK,
+                                                       "%s", msg);
+            gtk_dialog_run(GTK_DIALOG(dialog));
+            gtk_widget_destroy(dialog);
+
             stbi_image_free(image);
             updatePreviewBox(previewBoxWithImage);
         }
