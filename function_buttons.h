@@ -2,28 +2,32 @@
 #define IMAGE_PROCESSING_PROGRAM_UI_H
 
 #include <gtk/gtk.h>
+#include <stdbool.h>
+
+typedef struct adjustments {
+    double brightness;
+    double contrast;
+    double r;
+    double g;
+    double b;
+} Adjustments;
 
 typedef struct previewBoxWithImage {
     GtkWidget *previewBox;
     GtkWidget *previewImageWidget;
     GdkPixbuf *originalPixbuf;
-    GdkPixbuf *pixbufAdjustedByFunc;
+    GdkPixbuf *referencePixbuf;
     GdkPixbuf *preservedPixbuf;
-    double prevBrightnessScaleValue;
-    double prevContrastScaleValue;
-    double prevR;
-    double prevG;
-    double prevB;
+    Adjustments adjustments;
     GtkWidget* sigmaEntry;
     int softenKernelData;
-    int sharpenKernelData;
-    gpointer tempPixbuf;
 } PreviewBoxWithImage;
+
 
 void setBrightnessScale(GtkWidget* scale);
 void setContrastScale(GtkWidget* scale);
 void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue);
-void setGrayscaleScale(GtkWidget* scale);
+void setTransparencyScale(GtkWidget* scale);
 
 void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage);
 void openButtonClicked(GtkWidget *button, gpointer imageFile);

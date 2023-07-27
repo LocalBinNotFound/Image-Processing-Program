@@ -2,9 +2,6 @@
 #include "function_buttons.h"
 #include "image_modifications.h"
 
-int selectedSoftenKernel = 3;
-int selectedSharpenKernel = 3;
-
 GtkWidget* createCircleButtons(gint radius) {
     GtkWidget *button = gtk_button_new();
 
@@ -16,7 +13,7 @@ GtkWidget* createCircleButtons(gint radius) {
     cairo_t *cr = cairo_create(surface);
     cairo_set_line_width(cr, border_width);
     cairo_set_source_rgb(cr, 0, 0, 0);
-    cairo_arc(cr, radius, radius, radius - (border_width / 2), 0, 2 * G_PI);
+    cairo_arc(cr, radius, radius, radius - (float) (border_width / 2), 0, 2 * G_PI);
     cairo_stroke(cr);
     cairo_set_source_rgba(cr, 1, 1, 1, 0);
     cairo_arc(cr, radius, radius, radius - border_width, 0, 2 * G_PI);
@@ -107,8 +104,6 @@ GtkWidget* boxWithBorder(GtkWidget* content) {
     return framedBox;
 }
 
-
-
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
@@ -122,17 +117,13 @@ int main(int argc, char *argv[]) {
 
     // preview box
     GtkWidget *previewBox = gtk_event_box_new();
-    gtk_widget_set_size_request(previewBox, 400, 500);
+    gtk_widget_set_size_request(previewBox, 500, 500);
     GtkWidget *previewBoxWithBorder = boxWithBorder(previewBox);
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)malloc(sizeof(PreviewBoxWithImage));
     previewBoxWithImage->previewBox = previewBox;
     previewBoxWithImage->previewImageWidget = NULL;
     previewBoxWithImage->originalPixbuf = NULL;
-    previewBoxWithImage->pixbufAdjustedByFunc = NULL;
-    previewBoxWithImage->prevBrightnessScaleValue = 0.0;
-    previewBoxWithImage->prevR = 0.0;
-    previewBoxWithImage->prevG = 0.0;
-    previewBoxWithImage->prevB = 0.0;
+    previewBoxWithImage->referencePixbuf = NULL;
 
     // overall layout
     GtkWidget *overallBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -142,8 +133,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
-    gtk_box_set_spacing(GTK_BOX(leftFunctionBox),30);
-    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),40);
+    gtk_box_set_spacing(GTK_BOX(leftFunctionBox),40);
+    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),45);
 
     // logo
     gchar *currentFolder = g_path_get_dirname(__FILE__);
@@ -174,6 +165,21 @@ int main(int argc, char *argv[]) {
     g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
     g_signal_connect(mainWindow, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
+    // rgb
+    GtkWidget *RGBBox = tripleScaleBarBox(GTK_ORIENTATION_HORIZONTAL, "RGB");
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), RGBBox, FALSE, FALSE, 0);
+    GList *children = gtk_container_get_children(GTK_CONTAINER(RGBBox));
+    GtkWidget *rBox = GTK_WIDGET(g_list_nth_data(children, 1));
+    GtkWidget *gBox = GTK_WIDGET(g_list_nth_data(children, 2));
+    GtkWidget *bBox = GTK_WIDGET(g_list_nth_data(children, 3));
+    GtkWidget *rScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(rBox)), 1));
+    GtkWidget *gScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(gBox)), 1));
+    GtkWidget *bScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(bBox)), 1));
+    setRGBScales(rScale, gScale, bScale);
+    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustR), previewBoxWithImage);
+    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustG), previewBoxWithImage);
+    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustB), previewBoxWithImage);
+
     //brightness
     GtkWidget *brightnessBox = scaleNeg100To100(GTK_ORIENTATION_HORIZONTAL, "Brightness");
     gtk_box_pack_start(GTK_BOX(leftFunctionBox), brightnessBox, FALSE, FALSE, 0);
@@ -188,6 +194,42 @@ int main(int argc, char *argv[]) {
     setContrastScale(contrastScale);
     g_signal_connect(contrastScale, "value-changed", G_CALLBACK(adjustContrast), previewBoxWithImage);
 
+    // transparency
+    GtkWidget* transparencyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget* transparencyTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    GtkWidget* transparencyLabel = gtk_label_new("Tranparency");
+    GtkWidget* transparencyScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);
+    gtk_scale_set_draw_value(GTK_SCALE(transparencyScale), TRUE);
+    gtk_scale_set_has_origin(GTK_SCALE(transparencyScale), TRUE);
+    gtk_scale_set_value_pos(GTK_SCALE(transparencyScale), GTK_POS_BOTTOM);
+    gtk_widget_set_size_request(transparencyScale, 200, -1);
+    gtk_box_pack_start(GTK_BOX(transparencyTitleBox), transparencyLabel, FALSE, FALSE, 0);
+    gtk_box_set_homogeneous(GTK_BOX(transparencyTitleBox),TRUE);
+    gtk_box_pack_start(GTK_BOX(transparencyBox), transparencyTitleBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(transparencyBox), transparencyScale, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), transparencyBox, FALSE, FALSE, 0);
+    setTransparencyScale(transparencyScale);
+    g_signal_connect(transparencyScale, "value-changed", G_CALLBACK(adjustTransparency), previewBoxWithImage);
+
+    // invert color
+    GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), invertColorButton, FALSE, FALSE, 0);
+    g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
+
+    // monochrome
+    GtkWidget* monochromeBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget* monochromeButton = gtk_button_new_with_label("Monochrome");
+    gtk_box_pack_start(GTK_BOX(monochromeBox), monochromeButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), monochromeBox, FALSE, FALSE, 0);
+    g_signal_connect(monochromeButton, "clicked", G_CALLBACK(turnIntoGrayscale), previewBoxWithImage);
+
+    // sharpen
+    GtkWidget* sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), sharpenBox, FALSE, FALSE, 0);
+    GtkWidget* sharpenButton = gtk_button_new_with_label("Edge Enhancement");
+    g_signal_connect(sharpenButton, "clicked", G_CALLBACK(laplacianSharpen), previewBoxWithImage);
+    gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenButton, FALSE, FALSE, 0);
+
     // soften
     GtkWidget* softenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* softenLabel = gtk_label_new("Gaussian Blur");
@@ -195,11 +237,11 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(softenTitleBox), softenLabel, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(softenTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(softenBox), softenTitleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), softenBox, FALSE, FALSE, 0);
     GtkWidget* sigmaLabel = gtk_label_new("Sigma value:");
     GtkWidget* sigmaEntry = gtk_entry_new();
     previewBoxWithImage->sigmaEntry = sigmaEntry;
-    previewBoxWithImage->softenKernelData = selectedSoftenKernel;
+    previewBoxWithImage->softenKernelData = 3;
     GtkWidget* sigmaBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(sigmaBox), sigmaLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sigmaBox), sigmaEntry, FALSE, FALSE, 0);
@@ -229,78 +271,11 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(softenButtonsContainer), softenKernel4, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenButtonsContainer), softenKernel5, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenButtonsContainer), softenKernel6, FALSE, FALSE, 0);
-    GtkWidget* blurButton = gtk_button_new_with_label("Blur!");
+    GtkWidget* blurButton = gtk_button_new_with_label("Blur Image");
     g_signal_connect(blurButton, "clicked", G_CALLBACK(gaussianBlur), previewBoxWithImage);
     gtk_box_pack_start(GTK_BOX(softenBox), sigmaBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenBox), softenButtonsContainer, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(softenBox), blurButton, FALSE, FALSE, 0);
-
-    // sharpen
-    GtkWidget* sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget* sharpenLabel = gtk_label_new("Laplacian Sharpen");
-    GtkWidget* sharpenTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_pack_start(GTK_BOX(sharpenTitleBox), sharpenLabel, FALSE, FALSE, 0);
-    gtk_box_set_homogeneous(GTK_BOX(sharpenTitleBox), TRUE);
-    gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenTitleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(leftFunctionBox), sharpenBox, FALSE, FALSE, 0);
-    GtkWidget* sharpenKernel1 = createCircleButtons(5);
-    GtkWidget* sharpenKernel2 = createCircleButtons(7);
-    GtkWidget* sharpenKernel3 = createCircleButtons(9);
-    GtkWidget* sharpenKernel4 = createCircleButtons(11);
-    GtkWidget* sharpenKernel5 = createCircleButtons(13);
-    GtkWidget* sharpenKernel6 = createCircleButtons(15);
-    GtkWidget* sharpenButtonsContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel1, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel2, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel3, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel4, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel5, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenButtonsContainer), sharpenKernel6, FALSE, FALSE, 0);
-    GtkWidget* sharpenButton = gtk_button_new_with_label("Sharpen!");
-    g_signal_connect(sharpenButton, "clicked", G_CALLBACK(laplacianSharpen), previewBoxWithImage);
-    gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenButtonsContainer, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(sharpenBox), sharpenButton, FALSE, FALSE, 0);
-
-
-    // grayscale
-    GtkWidget* grayscaleBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget* grayscaleTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* grayscaleTitleLabel = gtk_label_new("Grayscale");
-    GtkWidget* grayscaleScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, -100.0, 100.0, 1.0);
-    gtk_scale_set_draw_value(GTK_SCALE(grayscaleScale), TRUE);
-    gtk_scale_set_has_origin(GTK_SCALE(grayscaleScale), TRUE);
-    gtk_scale_set_value_pos(GTK_SCALE(grayscaleScale), GTK_POS_BOTTOM);
-    gtk_widget_set_size_request(grayscaleScale, 200, -1);
-    gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
-    GtkWidget* turnGrayscaleButton = gtk_button_new_with_label("Turn to grayscale");
-
-    gtk_box_pack_start(GTK_BOX(grayscaleTitleBox), grayscaleTitleLabel, FALSE, FALSE, 0);
-    gtk_box_set_homogeneous(GTK_BOX(grayscaleTitleBox), TRUE);
-    gtk_box_pack_start(GTK_BOX(grayscaleBox), grayscaleTitleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(grayscaleBox), turnGrayscaleButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(grayscaleBox), grayscaleScale, FALSE, FALSE,0);
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), grayscaleBox, FALSE, FALSE, 0);
-    setGrayscaleScale(grayscaleScale);
-    g_signal_connect(turnGrayscaleButton, "clicked", G_CALLBACK(turnIntoGrayscale), previewBoxWithImage);
-    g_signal_connect(grayscaleScale, "value-changed", G_CALLBACK(adjustGrayscale), previewBoxWithImage);
-
-
-
-    // rgb
-    GtkWidget *RGBBox = tripleScaleBarBox(GTK_ORIENTATION_HORIZONTAL, "RGB");
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), RGBBox, FALSE, FALSE, 0);
-    GList *children = gtk_container_get_children(GTK_CONTAINER(RGBBox));
-    GtkWidget *rBox = GTK_WIDGET(g_list_nth_data(children, 1));
-    GtkWidget *gBox = GTK_WIDGET(g_list_nth_data(children, 2));
-    GtkWidget *bBox = GTK_WIDGET(g_list_nth_data(children, 3));
-    GtkWidget *rScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(rBox)), 1));
-    GtkWidget *gScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(gBox)), 1));
-    GtkWidget *bScale = GTK_WIDGET(g_list_nth_data(gtk_container_get_children(GTK_CONTAINER(bBox)), 1));
-    setRGBScales(rScale, gScale, bScale);
-    g_signal_connect(rScale, "value-changed", G_CALLBACK(adjustR), previewBoxWithImage);
-    g_signal_connect(gScale, "value-changed", G_CALLBACK(adjustG), previewBoxWithImage);
-    g_signal_connect(bScale, "value-changed", G_CALLBACK(adjustB), previewBoxWithImage);
-
 
     // mirror
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -341,11 +316,6 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateRightButton, FALSE, FALSE, 0);
     // need to connect buttons to functions
 
-
-    // invert color
-    GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
-    gtk_box_pack_start(GTK_BOX(leftFunctionBox), invertColorButton, FALSE, FALSE, 0);
-    /********/g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
 
     /*
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);

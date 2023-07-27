@@ -5,13 +5,14 @@
 #include <stdbool.h>
 #include "stb/stb_image.h"
 #include "stb/stb_image_write.h"
+#include "function_buttons.h"
 
 GtkWidget* brightnessScale;
 GtkWidget* contrastScale;
 GtkWidget* redScale;
 GtkWidget* greenScale;
 GtkWidget* blueScale;
-GtkWidget* grayscaleScale;
+GtkWidget* transparencyScale;
 
 void setBrightnessScale(GtkWidget* scale) {
     brightnessScale = scale;
@@ -24,26 +25,10 @@ void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue) {
     greenScale = green;
     blueScale = blue;
 }
-void setGrayscaleScale(GtkWidget* scale) {
-    grayscaleScale = scale;
-}
 
-typedef struct previewBoxWithImage {
-    GtkWidget *previewBox;
-    GtkWidget *previewImageWidget;
-    GdkPixbuf *originalPixbuf;
-    GdkPixbuf *pixbufAdjustedByFunc;
-    GdkPixbuf *preservedPixbuf;
-    double prevBrightnessScaleValue;
-    double prevContrastScaleValue;
-    double prevR;
-    double prevG;
-    double prevB;
-    GtkWidget* sigmaEntry;
-    int softenKernelData;
-    int sharpenKernelData;
-    gpointer tempPixbuf;
-} PreviewBoxWithImage;
+void setTransparencyScale(GtkWidget* scale) {
+    transparencyScale = scale;
+}
 
 // call this function to update the preview image whenever originalPixbuf has been modified
 void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage) {
@@ -103,10 +88,15 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
 
             GdkPixbuf *originalPixbuf = gdk_pixbuf_new_from_data(alignedImage, GDK_COLORSPACE_RGB, channels == 4,
                                                                  8, width, height, rowstride, NULL, NULL);
+            printf("%d", channels);
             previewBoxWithImage->originalPixbuf = originalPixbuf;
-            previewBoxWithImage->pixbufAdjustedByFunc = gdk_pixbuf_copy(originalPixbuf);
+            previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(originalPixbuf);
             previewBoxWithImage->preservedPixbuf = gdk_pixbuf_copy(originalPixbuf);
-            previewBoxWithImage->prevBrightnessScaleValue = 0.0;
+            previewBoxWithImage->adjustments.brightness = 0.0;
+            previewBoxWithImage->adjustments.contrast = 0.0;
+            previewBoxWithImage->adjustments.r = 0.0;
+            previewBoxWithImage->adjustments.g = 0.0;
+            previewBoxWithImage->adjustments.b = 0.0;
             stbi_image_free(image);
             updatePreviewBox(previewBoxWithImage);
         }
@@ -173,7 +163,7 @@ void clearButtonClicked(GtkWidget *button, gpointer imageFile) {
         gtk_range_set_value(GTK_RANGE(redScale), 0.0);
         gtk_range_set_value(GTK_RANGE(greenScale), 0.0);
         gtk_range_set_value(GTK_RANGE(blueScale), 0.0);
-        gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
+        gtk_range_set_value(GTK_RANGE(transparencyScale), 0.0);
         updatePreviewBox(previewBoxWithImage);
     }
 }
@@ -202,11 +192,11 @@ void resetButtonClicked(GtkWidget *button, gpointer imageFile) {
             gtk_range_set_value(GTK_RANGE(redScale), 0.0);
             gtk_range_set_value(GTK_RANGE(greenScale), 0.0);
             gtk_range_set_value(GTK_RANGE(blueScale), 0.0);
-            gtk_range_set_value(GTK_RANGE(grayscaleScale), 0.0);
+            gtk_range_set_value(GTK_RANGE(transparencyScale), 0.0);
             g_object_unref(previewBoxWithImage->originalPixbuf);
             previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(preservedPixbuf);
-            g_object_unref(previewBoxWithImage->pixbufAdjustedByFunc);
-            previewBoxWithImage->pixbufAdjustedByFunc = gdk_pixbuf_copy(preservedPixbuf);
+            g_object_unref(previewBoxWithImage->referencePixbuf);
+            previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(preservedPixbuf);
         }
         updatePreviewBox(previewBoxWithImage);
     }

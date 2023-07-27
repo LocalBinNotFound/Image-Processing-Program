@@ -5,18 +5,17 @@
 
 void adjustBrightness(GtkWidget* scale, gpointer imageFile);
 void adjustContrast(GtkWidget* scale, gpointer imageFile);
+void adjustTransparency(GtkWidget* scale, gpointer imageFile);
 void gaussianBlur(GtkWidget* button, gpointer imageFile);
 void laplacianSharpen(GtkWidget* button, gpointer imageFile);
 void turnIntoGrayscale(GtkWidget* button, gpointer imageFile);
-void adjustGrayscale(GtkWidget* scale, gpointer imageFile);
-void rotateByDegree();
 void mirrorImageUpDown(GtkWidget* scale, gpointer imageFile);
 void mirrorImageLeftRight(GtkWidget* scale, gpointer imageFile);
 void adjustR(GtkWidget* scale, gpointer imageFile);
 void adjustG(GtkWidget* scale, gpointer imageFile);
 void adjustB(GtkWidget* scale, gpointer imageFile);
 void invertColor(GtkWidget *button, gpointer imageFile);
-void adjustTransparency(GtkWidget *scale, gpointer imageFile);
+void rotateByDegree(int degree, gpointer imageFile);
 
 #endif // IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
 
