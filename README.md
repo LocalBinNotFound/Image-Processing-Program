@@ -15,7 +15,7 @@ the nearest-neighbor technique.
 8. Grayscale: Turn a color image to a grayscale image.
 9. Mirror Image: Produce a mirror image of the imported image.
 10. RGB: change the red-green-blue (RGB) components of the image.
-11. ...
+11. Transparency: change the transparency of an image (image format that supports alpha channel).
 
 ## Tools:
 - stb image -- single-file public domain libraries for C/C++
@@ -29,15 +29,15 @@ the nearest-neighbor technique.
     see: https://github.com/GNOME/gtk/releases/tag/3.24.38
   - GTK 4.x is not necessary for this project - see: https://github.com/GNOME/gtk
   - GTK-3.0 documentation https://docs.gtk.org/gtk3/index.html
-  - to install GTK 3.24.28, in terminal (assume homebrew has already been installed), type `brew install gtk+3`
+  - to install GTK 3.24.38, in terminal (assume homebrew has already been installed), type `brew install gtk+3`
 
 
 - PkgConfig -- package search and retrieval tool for UNIX-like OS
   - in terminal, type `brew install pkg-config`
 
 ## Program
-- to run program, navigate to project directory and type
+- to run program, navigate to project directory and compile
   ```
-  gcc main.c image_functions.c xxx.c xxx.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
+  gcc main_window.c image_modifications.c function_buttons.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
   sudo ./Image_Wicked
   ```
