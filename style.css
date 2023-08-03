@@ -1,9 +1,6 @@
 button {
     color: black;
     font-style: normal;
-    font-family: "Yuanti SC";
-    font-size: 16px;
-    font-weight: bold;
     background-color: #AAAAAA;
     border: 0.1em solid dimgray;
     border-radius: 10px;
@@ -16,6 +13,6 @@ button:hover {
 
 label {
     font-weight: bolder;
-    font-family: "Yuanti SC";
+    font-family: "Yuanti SC", system-ui;
     font-size: 16px;
 }
