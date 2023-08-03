@@ -14,3 +14,8 @@ button:hover {
     background-color: aqua;
 }
 
+label {
+    font-weight: bolder;
+    font-family: "Yuanti SC";
+    font-size: 16px;
+}
