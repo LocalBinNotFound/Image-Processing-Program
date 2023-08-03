@@ -283,6 +283,8 @@ int main(int argc, char *argv[]) {
     GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     GtkWidget *mirrorUpDownButton = gtk_button_new_with_label("UP/DOWN");
     GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("LEFT/RIGHT");
+    gtk_widget_set_size_request(mirrorUpDownButton, 100, 30);
+    gtk_widget_set_size_request(mirrorLeftRightButton, 100, 30);
     GtkWidget *mirrorLabel = gtk_label_new("Mirror Image");
     gtk_box_pack_start(GTK_BOX(mirrorTitleBox), mirrorLabel, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(mirrorTitleBox), TRUE);
@@ -291,7 +293,7 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorButtonBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorUpDownButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
-    gtk_box_set_spacing(GTK_BOX(mirrorButtonBox), 20);
+
     g_signal_connect(mirrorUpDownButton, "clicked", G_CALLBACK(mirrorImageUpDown), previewBoxWithImage);
     g_signal_connect(mirrorLeftRightButton, "clicked", G_CALLBACK(mirrorImageLeftRight), previewBoxWithImage);
     // need to connect buttons to functions
@@ -302,6 +304,8 @@ int main(int argc, char *argv[]) {
     GtkWidget *rotateButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     GtkWidget *rotateLeftButton = gtk_button_new_with_label("L");
     GtkWidget *rotateRightButton = gtk_button_new_with_label("R");
+    gtk_widget_set_size_request(rotateLeftButton, 100, 30);
+    gtk_widget_set_size_request(rotateRightButton, 100, 30);
     GtkWidget *rotateLabel = gtk_label_new("Rotation by Degree");
     GtkWidget* rotateTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateLabel, FALSE, FALSE, 0);
@@ -316,6 +320,19 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateRightButton, FALSE, FALSE, 0);
     // need to connect buttons to functions
 
+
+    // customize using css
+    GtkCssProvider *cssProvider = gtk_css_provider_new();
+    GError *error = NULL;
+    gtk_css_provider_load_from_file(cssProvider, g_file_new_for_path(g_build_filename(currentFolder, "style.css", NULL)), &error);
+
+    if (error != NULL) {
+        g_printerr("Error loading CSS: %s\n", error->message);
+        g_clear_error(&error);
+    }
+    GdkDisplay *display = gdk_display_get_default();
+    GdkScreen *screen = gdk_display_get_default_screen(display);
+    gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     /*
     GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
