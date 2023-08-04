@@ -15,7 +15,9 @@ void adjustR(GtkWidget* scale, gpointer imageFile);
 void adjustG(GtkWidget* scale, gpointer imageFile);
 void adjustB(GtkWidget* scale, gpointer imageFile);
 void invertColor(GtkWidget *button, gpointer imageFile);
-void rotateByDegree(int degree, gpointer imageFile);
+void rotateByDegree(int degree, PreviewBoxWithImage* previewBoxWithImage);
+void rotateLeft(GtkWidget* button, gpointer data);
+void rotateRight(GtkWidget* button, gpointer data);
 
 #endif // IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
 

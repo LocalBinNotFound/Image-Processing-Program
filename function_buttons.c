@@ -214,3 +214,4 @@ void resetButtonClicked(GtkWidget *button, gpointer imageFile) {
 
     gtk_widget_destroy(dialog);
 }
+

@@ -284,18 +284,73 @@ void turnIntoGrayscale(GtkWidget* button, gpointer imageFile) {
 }
 
 
-
 // Rotate an image by a specified angle using interpolation techniques such as nearest-neighbor technique
-void rotateByDegree(int degree, gpointer imageFile) {
-    PreviewBoxWithImage *previewBoxWithImage = imageFile;
-
+void rotateByDegree(int degree, PreviewBoxWithImage* previewBoxWithImage) {
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to rotate!");
-    } else {
-        //  need impl
+        return;
     }
+
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    int width = gdk_pixbuf_get_width(originalPixbuf);
+    int height = gdk_pixbuf_get_height(originalPixbuf);
+    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
+
+    // Create a new pixbuf to hold the rotated image
+    GdkPixbuf* rotatedPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, width, height);
+
+    double angle = degree * M_PI / 180.0; // Convert degrees to radians
+    double centerX = width / 2.0;
+    double centerY = height / 2.0;
+
+    guint8* srcPixels = gdk_pixbuf_get_pixels(originalPixbuf);
+    guint8* destPixels = gdk_pixbuf_get_pixels(rotatedPixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Translate point to the origin (center), rotate, then translate back
+            int srcX = (int)((x - centerX) * cos(angle) - (y - centerY) * sin(angle) + centerX);
+            int srcY = (int)((x - centerX) * sin(angle) + (y - centerY) * cos(angle) + centerY);
+
+            if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
+                guint8* srcPixel = srcPixels + srcY * rowstride + srcX * channels;
+                guint8* destPixel = destPixels + y * rowstride + x * channels;
+
+                for (int c = 0; c < channels; c++) {
+                    destPixel[c] = srcPixel[c];
+                }
+            }
+        }
+    }
+
+    g_object_unref(originalPixbuf);
+    previewBoxWithImage->originalPixbuf = rotatedPixbuf;
+    updatePreviewBox(previewBoxWithImage);
+    g_message("Image rotated by %d degrees successfully!", degree);
 }
 
+void rotateLeft(GtkWidget* button, gpointer data) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)data;
+    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
+    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
+    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
+    g_list_free(children);
+    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
+    int degree = atoi(text);
+    rotateByDegree(-degree, previewBoxWithImage); // negative to rotate left
+}
+
+void rotateRight(GtkWidget* button, gpointer data) {
+    PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)data;
+    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
+    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
+    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
+    g_list_free(children);
+    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
+    int degree = atoi(text);
+    rotateByDegree(degree, previewBoxWithImage); // positive to rotate right
+}
 
 
 void mirrorImageUpDown(GtkWidget* scale, gpointer imageFile) {

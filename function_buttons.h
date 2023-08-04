@@ -28,7 +28,8 @@ void setBrightnessScale(GtkWidget* scale);
 void setContrastScale(GtkWidget* scale);
 void setRGBScales(GtkWidget* red, GtkWidget* green, GtkWidget* blue);
 void setTransparencyScale(GtkWidget* scale);
-
+void rotateLeft(GtkWidget *button, gpointer data);
+void rotateRight(GtkWidget *button, gpointer data);
 void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage);
 void openButtonClicked(GtkWidget *button, gpointer imageFile);
 void saveButtonClicked(GtkWidget *button, gpointer imageFile);

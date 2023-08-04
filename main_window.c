@@ -318,7 +318,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(rotateBox), rotateButtonBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateLeftButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateRightButton, FALSE, FALSE, 0);
-    // need to connect buttons to functions
+    g_signal_connect(rotateLeftButton, "clicked", G_CALLBACK(rotateLeft), previewBoxWithImage);
+    g_signal_connect(rotateRightButton, "clicked", G_CALLBACK(rotateRight), previewBoxWithImage);
 
 
     // customize using css
