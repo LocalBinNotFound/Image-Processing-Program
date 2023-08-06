@@ -294,62 +294,44 @@ void rotateByDegree(int degree, PreviewBoxWithImage* previewBoxWithImage) {
     GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
     int width = gdk_pixbuf_get_width(originalPixbuf);
     int height = gdk_pixbuf_get_height(originalPixbuf);
-    int channels = gdk_pixbuf_get_n_channels(originalPixbuf);
-
-    // Create a new pixbuf to hold the rotated image
-    GdkPixbuf* rotatedPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, width, height);
 
     double angle = degree * M_PI / 180.0; // Convert degrees to radians
-    double centerX = width / 2.0;
-    double centerY = height / 2.0;
 
-    guint8* srcPixels = gdk_pixbuf_get_pixels(originalPixbuf);
-    guint8* destPixels = gdk_pixbuf_get_pixels(rotatedPixbuf);
-    int rowstride = gdk_pixbuf_get_rowstride(originalPixbuf);
+    int dst_width = ceil(fabs(cos(angle)) * width + fabs(sin(angle)) * height);
+    int dst_height = ceil(fabs(sin(angle)) * width + fabs(cos(angle)) * height);
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            // Translate point to the origin (center), rotate, then translate back
-            int srcX = (int)((x - centerX) * cos(angle) - (y - centerY) * sin(angle) + centerX);
-            int srcY = (int)((x - centerX) * sin(angle) + (y - centerY) * cos(angle) + centerY);
+    GdkPixbuf *dst = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, dst_width, dst_height);
+    gdk_pixbuf_fill(dst, 0x00000000);
 
-            if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height) {
-                guint8* srcPixel = srcPixels + srcY * rowstride + srcX * channels;
-                guint8* destPixel = destPixels + y * rowstride + x * channels;
-
-                for (int c = 0; c < channels; c++) {
-                    destPixel[c] = srcPixel[c];
-                }
-            }
-        }
-    }
+    GdkPixbuf *rotated = gdk_pixbuf_rotate_simple(originalPixbuf, degree);
+    gdk_pixbuf_composite(rotated, dst, 0, 0, dst_width, dst_height, 0, 0, 1, 1, GDK_INTERP_NEAREST, 255);
 
     g_object_unref(originalPixbuf);
-    previewBoxWithImage->originalPixbuf = rotatedPixbuf;
+    previewBoxWithImage->originalPixbuf = dst;
     updatePreviewBox(previewBoxWithImage);
     g_message("Image rotated by %d degrees successfully!", degree);
 }
 
 void rotateLeft(GtkWidget* button, gpointer data) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)data;
-    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
-    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
-    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
-    g_list_free(children);
-    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
-    int degree = atoi(text);
-    rotateByDegree(-degree, previewBoxWithImage); // negative to rotate left
+//    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
+//    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
+//    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
+//    g_list_free(children);
+//    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
+//    int degree = atoi(text);
+    rotateByDegree(90, previewBoxWithImage); // negative to rotate left
 }
 
 void rotateRight(GtkWidget* button, gpointer data) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)data;
-    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
-    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
-    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
-    g_list_free(children);
-    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
-    int degree = atoi(text);
-    rotateByDegree(degree, previewBoxWithImage); // positive to rotate right
+//    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
+//    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
+//    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
+//    g_list_free(children);
+//    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
+//    int degree = atoi(text);
+    rotateByDegree(270, previewBoxWithImage); // positive to rotate right
 }
 
 
