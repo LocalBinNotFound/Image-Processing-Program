@@ -62,6 +62,7 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
+
 void adjustContrast(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
@@ -105,6 +106,7 @@ void adjustContrast(GtkWidget* scale, gpointer imageFile) {
         previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(contrastPixbuf);
     }
 }
+
 
 void adjustTransparency(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
@@ -199,7 +201,6 @@ void gaussianBlur(GtkWidget* button, gpointer imageFile) {
         g_object_unref(originalPixbuf);
         previewBoxWithImage->originalPixbuf = blurredPixbuf;
         updatePreviewBox(previewBoxWithImage);
-        g_message("Image blurred successfully!");
     }
 }
 
@@ -253,9 +254,9 @@ void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
         g_object_unref(originalPixbuf);
         previewBoxWithImage->originalPixbuf = sharpenedPixbuf;
         updatePreviewBox(previewBoxWithImage);
-        g_message("Image sharpened successfully!");
     }
 }
+
 
 void turnIntoGrayscale(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
@@ -284,7 +285,6 @@ void turnIntoGrayscale(GtkWidget* button, gpointer imageFile) {
 }
 
 
-// Rotate an image by a specified angle using interpolation techniques such as nearest-neighbor technique
 void rotateByDegree(int degree, PreviewBoxWithImage* previewBoxWithImage) {
     if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
         g_message("No image available to rotate!");
@@ -307,31 +307,19 @@ void rotateByDegree(int degree, PreviewBoxWithImage* previewBoxWithImage) {
     gdk_pixbuf_composite(rotated, dst, 0, 0, dst_width, dst_height, 0, 0, 1, 1, GDK_INTERP_NEAREST, 255);
 
     g_object_unref(originalPixbuf);
-    previewBoxWithImage->originalPixbuf = dst;
+    previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(dst);
+    previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(dst);
     updatePreviewBox(previewBoxWithImage);
-    g_message("Image rotated by %d degrees successfully!", degree);
 }
 
 void rotateLeft(GtkWidget* button, gpointer data) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)data;
-//    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
-//    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
-//    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
-//    g_list_free(children);
-//    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
-//    int degree = atoi(text);
-    rotateByDegree(90, previewBoxWithImage); // negative to rotate left
+    rotateByDegree(90, previewBoxWithImage);
 }
 
 void rotateRight(GtkWidget* button, gpointer data) {
     PreviewBoxWithImage* previewBoxWithImage = (PreviewBoxWithImage*)data;
-//    GtkWidget* entry = gtk_widget_get_parent(gtk_widget_get_parent(button));
-//    GList* children = gtk_container_get_children(GTK_CONTAINER(entry));
-//    GtkWidget* rotateAngleTxtBox = GTK_WIDGET(g_list_nth_data(children, 0));
-//    g_list_free(children);
-//    const gchar* text = gtk_entry_get_text(GTK_ENTRY(rotateAngleTxtBox));
-//    int degree = atoi(text);
-    rotateByDegree(270, previewBoxWithImage); // positive to rotate right
+    rotateByDegree(270, previewBoxWithImage);
 }
 
 
@@ -365,7 +353,8 @@ void mirrorImageUpDown(GtkWidget* scale, gpointer imageFile) {
     }
 
     g_object_unref(previewBoxWithImage->originalPixbuf);
-    previewBoxWithImage->originalPixbuf = mirroredPixbuf;
+    previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(mirroredPixbuf);
+    previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(mirroredPixbuf);
     updatePreviewBox(previewBoxWithImage);
 }
 
@@ -401,9 +390,12 @@ void mirrorImageLeftRight(GtkWidget* scale, gpointer imageFile) {
         }
     }
     g_object_unref(previewBoxWithImage->originalPixbuf);
-    previewBoxWithImage->originalPixbuf = mirroredPixbuf;
+    previewBoxWithImage->originalPixbuf = gdk_pixbuf_copy(mirroredPixbuf);
+    previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(mirroredPixbuf);
     updatePreviewBox(previewBoxWithImage);
 }
+
+
 
 void adjustR(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
@@ -566,6 +558,8 @@ void adjustB(GtkWidget* scale, gpointer imageFile) {
     updatePreviewBox(previewBoxWithImage);
     previewBoxWithImage->adjustments.b = blueValue;
 }
+
+
 
 void invertColor(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;

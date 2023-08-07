@@ -293,11 +293,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(mirrorBox), mirrorButtonBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorUpDownButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(mirrorButtonBox), mirrorLeftRightButton, FALSE, FALSE, 0);
-
     g_signal_connect(mirrorUpDownButton, "clicked", G_CALLBACK(mirrorImageUpDown), previewBoxWithImage);
     g_signal_connect(mirrorLeftRightButton, "clicked", G_CALLBACK(mirrorImageLeftRight), previewBoxWithImage);
-    // need to connect buttons to functions
-
 
     // rotate
     GtkWidget *rotateBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -310,7 +307,6 @@ int main(int argc, char *argv[]) {
     GtkWidget* rotateTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateLabel, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(rotateTitleBox), TRUE);
-
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), rotateBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateBox), rotateTitleBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateBox), rotateButtonBox, FALSE, FALSE, 0);
@@ -318,7 +314,6 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateRightButton, FALSE, FALSE, 0);
     g_signal_connect(rotateLeftButton, "clicked", G_CALLBACK(rotateLeft), previewBoxWithImage);
     g_signal_connect(rotateRightButton, "clicked", G_CALLBACK(rotateRight), previewBoxWithImage);
-
 
     // customize using css
     GtkCssProvider *cssProvider = gtk_css_provider_new();
@@ -332,16 +327,6 @@ int main(int argc, char *argv[]) {
     GdkDisplay *display = gdk_display_get_default();
     GdkScreen *screen = gdk_display_get_default_screen(display);
     gtk_style_context_add_provider_for_screen(screen, GTK_STYLE_PROVIDER(cssProvider), GTK_STYLE_PROVIDER_PRIORITY_USER);
-
-    /*
-    GtkWidget *creditsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget *creditText =  gtk_label_new("Authors:\n"
-                                           "\tJunjie Fang - LocalBinNotFound\n"
-                                           "\tWeijian Huang - learningmachine999\n"
-                                           "\tQirui Yang - Antonyyqr\n"
-                                           "\tXiyuan Tu - XiyuanTu");
-    gtk_box_pack_start(GTK_BOX(creditsBox), creditText, FALSE, FALSE, 0);
-     */
 
     // Add all widgets to the main window
     gtk_container_add(GTK_CONTAINER(mainWindow), overallBox);
