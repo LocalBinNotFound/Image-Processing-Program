@@ -302,8 +302,8 @@ int main(int argc, char *argv[]) {
     // rotate
     GtkWidget *rotateBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *rotateButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    GtkWidget *rotateLeftButton = gtk_button_new_with_label("\u21B6");
-    GtkWidget *rotateRightButton = gtk_button_new_with_label("\u21B7");
+    GtkWidget *rotateLeftButton = gtk_button_new_with_label("\u21BA");
+    GtkWidget *rotateRightButton = gtk_button_new_with_label("\u21BB");
     gtk_widget_set_size_request(rotateLeftButton, 50, 50);
     gtk_widget_set_size_request(rotateRightButton, 50, 50);
     GtkWidget *rotateLabel = gtk_label_new("Rotate Image");
