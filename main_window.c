@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
     // transparency
     GtkWidget* transparencyBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* transparencyTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    GtkWidget* transparencyLabel = gtk_label_new("Tranparency");
+    GtkWidget* transparencyLabel = gtk_label_new("Transparency");
     GtkWidget* transparencyScale = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);
     gtk_scale_set_draw_value(GTK_SCALE(transparencyScale), TRUE);
     gtk_scale_set_has_origin(GTK_SCALE(transparencyScale), TRUE);
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
     GtkWidget* sigmaBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(sigmaBox), sigmaLabel, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(sigmaBox), sigmaEntry, FALSE, FALSE, 0);
-    gtk_entry_set_placeholder_text(GTK_ENTRY(sigmaEntry), "0.1 to 5.0， default 1.0");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(sigmaEntry), "0.1 to 5.0, default 1.0");
     GtkWidget* softenKernel1 = createCircleButtons(5);
     GtkWidget* softenKernel2 = createCircleButtons(7);
     GtkWidget* softenKernel3 = createCircleButtons(9);
@@ -281,10 +281,10 @@ int main(int argc, char *argv[]) {
     GtkWidget *mirrorBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* mirrorTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *mirrorButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    GtkWidget *mirrorUpDownButton = gtk_button_new_with_label("UP/DOWN");
-    GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("LEFT/RIGHT");
-    gtk_widget_set_size_request(mirrorUpDownButton, 100, 30);
-    gtk_widget_set_size_request(mirrorLeftRightButton, 100, 30);
+    GtkWidget *mirrorUpDownButton = gtk_button_new_with_label("\u2195");
+    GtkWidget *mirrorLeftRightButton = gtk_button_new_with_label("\u2194");
+    gtk_widget_set_size_request(mirrorUpDownButton, 50, 50);
+    gtk_widget_set_size_request(mirrorLeftRightButton, 50, 50);
     GtkWidget *mirrorLabel = gtk_label_new("Mirror Image");
     gtk_box_pack_start(GTK_BOX(mirrorTitleBox), mirrorLabel, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(mirrorTitleBox), TRUE);
@@ -302,19 +302,17 @@ int main(int argc, char *argv[]) {
     // rotate
     GtkWidget *rotateBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *rotateButtonBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    GtkWidget *rotateLeftButton = gtk_button_new_with_label("L");
-    GtkWidget *rotateRightButton = gtk_button_new_with_label("R");
-    gtk_widget_set_size_request(rotateLeftButton, 100, 30);
-    gtk_widget_set_size_request(rotateRightButton, 100, 30);
-    GtkWidget *rotateLabel = gtk_label_new("Rotation by Degree");
+    GtkWidget *rotateLeftButton = gtk_button_new_with_label("\u21B6");
+    GtkWidget *rotateRightButton = gtk_button_new_with_label("\u21B7");
+    gtk_widget_set_size_request(rotateLeftButton, 50, 50);
+    gtk_widget_set_size_request(rotateRightButton, 50, 50);
+    GtkWidget *rotateLabel = gtk_label_new("Rotate Image");
     GtkWidget* rotateTitleBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     gtk_box_pack_start(GTK_BOX(rotateTitleBox), rotateLabel, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(rotateTitleBox), TRUE);
-    GtkWidget *rotateAngleTxtBox = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(rotateAngleTxtBox), "Enter rotation degree here");
+
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), rotateBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateBox), rotateTitleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rotateBox), rotateAngleTxtBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateBox), rotateButtonBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateLeftButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rotateButtonBox), rotateRightButton, FALSE, FALSE, 0);
