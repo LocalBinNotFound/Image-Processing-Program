@@ -1,22 +1,23 @@
 #include <gtk/gtk.h>
 #include "function_buttons.h"
 #include "image_modifications.h"
+#include <cairo.h>
 
-GtkWidget* createCircleButtons(gint radius) {
+GtkWidget* createCircleButtons(int radius) {
     GtkWidget *button = gtk_button_new();
 
-    gint diameter = radius * 2;
-    gint border_width = 2;
+    int diameter = radius * 2;
+    float border_width = 2;
     GtkWidget *image = gtk_image_new();
 
     cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, diameter, diameter);
     cairo_t *cr = cairo_create(surface);
     cairo_set_line_width(cr, border_width);
     cairo_set_source_rgb(cr, 0, 0, 0);
-    cairo_arc(cr, radius, radius, radius - (float) (border_width / 2), 0, 2 * G_PI);
+    cairo_arc(cr, radius, radius, (float) radius - (border_width / 2), 0, 2 * G_PI);
     cairo_stroke(cr);
     cairo_set_source_rgba(cr, 1, 1, 1, 0);
-    cairo_arc(cr, radius, radius, radius - border_width, 0, 2 * G_PI);
+    cairo_arc(cr, radius, radius, (float) radius - border_width, 0, 2 * G_PI);
     cairo_fill(cr);
     cairo_destroy(cr);
 

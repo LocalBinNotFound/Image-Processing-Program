@@ -35,9 +35,14 @@ the nearest-neighbor technique.
 - PkgConfig -- package search and retrieval tool for UNIX-like OS
   - in terminal, type `brew install pkg-config`
 
+
+- Cairo - 2D graphics library
+  - Cairo is a library that provides a vector graphic-based, device-independent API for developers -
+    see: https://cairographics.org/
+  - to install cairo, in terminal, type `brew install cairo`
 ## Program
 - to run program, navigate to project directory and compile
   ```
   gcc main_window.c image_modifications.c function_buttons.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
-  sudo ./Image_Wicked
+  ./Image_Wicked
   ```
