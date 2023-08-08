@@ -27,21 +27,20 @@ the nearest-neighbor technique.
 - GTK (GIMP Toolkit) -- toolkit for creating graphical user interface (GUI)
   - GTK 3.24.38 is deprecated but is the latest old stable GTK for GUI creation -
     see: https://github.com/GNOME/gtk/releases/tag/3.24.38
-  - GTK 4.x is not necessary for this project - see: https://github.com/GNOME/gtk
   - GTK-3.0 documentation https://docs.gtk.org/gtk3/index.html
-  - to install GTK 3.24.38, in terminal (assume homebrew has already been installed), type `brew install gtk+3`
+  - to install GTK 3.24.38: `brew install gtk+3`
 
 
 - PkgConfig -- package search and retrieval tool for UNIX-like OS
-  - in terminal, type `brew install pkg-config`
+  - to install pkg-config: `brew install pkg-config`
 
 
 - Cairo - 2D graphics library
   - Cairo is a library that provides a vector graphic-based, device-independent API for developers -
     see: https://cairographics.org/
-  - to install cairo, in terminal, type `brew install cairo`
+  - to install cairo: `brew install cairo`
 ## Program
-- to compile, do
+- to compile:
   ```
   gcc main_window.c image_modifications.c function_buttons.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
   ```
