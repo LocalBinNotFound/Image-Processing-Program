@@ -295,7 +295,7 @@ void rotateByDegree(int degree, PreviewBoxWithImage* previewBoxWithImage) {
     int width = gdk_pixbuf_get_width(originalPixbuf);
     int height = gdk_pixbuf_get_height(originalPixbuf);
 
-    double angle = degree * M_PI / 180.0; // Convert degrees to radians
+    double angle = degree * M_PI / 180.0;
 
     int dst_width = ceil(fabs(cos(angle)) * width + fabs(sin(angle)) * height);
     int dst_height = ceil(fabs(sin(angle)) * width + fabs(cos(angle)) * height);
