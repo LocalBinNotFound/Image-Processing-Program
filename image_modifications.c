@@ -311,6 +311,7 @@ void applyVintageFilter(GtkWidget* button, gpointer imageFile) {
 
     g_object_unref(originalPixbuf);
     previewBoxWithImage->originalPixbuf = vintagePixbuf;
+    previewBoxWithImage->referencePixbuf = gdk_pixbuf_copy(vintagePixbuf);
     updatePreviewBox(previewBoxWithImage);
 }
 
