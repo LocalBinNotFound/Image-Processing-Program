@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
 
     // monochrome
     GtkWidget* monochromeBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget* monochromeButton = gtk_button_new_with_label("Monochrome");
+    GtkWidget* monochromeButton = gtk_button_new_with_label("Monochrome Effect");
     gtk_box_pack_start(GTK_BOX(monochromeBox), monochromeButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), monochromeBox, FALSE, FALSE, 0);
     g_signal_connect(monochromeButton, "clicked", G_CALLBACK(turnIntoGrayscale), previewBoxWithImage);
@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
 
     // old picture
     GtkWidget* oldPicBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    GtkWidget* oldPicButton = gtk_button_new_with_label("Old Picture");
+    GtkWidget* oldPicButton = gtk_button_new_with_label("Nostalgic Effect");
     gtk_box_pack_start(GTK_BOX(oldPicBox), oldPicButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), oldPicBox, FALSE, FALSE, 0);
     g_signal_connect(oldPicButton, "clicked", G_CALLBACK(oldPictureFilter), previewBoxWithImage);
