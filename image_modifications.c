@@ -277,6 +277,45 @@ void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
     }
 }
 
+void oldPictureFilter(GtkWidget* button, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to apply custom filter!");
+    } else {
+        GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+        GdkPixbuf* customPixbuf = gdk_pixbuf_copy(originalPixbuf);
+        int width = gdk_pixbuf_get_width(customPixbuf);
+        int height = gdk_pixbuf_get_height(customPixbuf);
+        int channels = gdk_pixbuf_get_n_channels(customPixbuf);
+        int rowstride = gdk_pixbuf_get_rowstride(customPixbuf);
+
+        guint8* pixels = gdk_pixbuf_get_pixels(customPixbuf);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                guint8* pixel = pixels + y * rowstride + x * channels;
+                guint8 r = pixel[0];
+                guint8 g = pixel[1];
+                guint8 b = pixel[2];
+
+                guint8 newB = (guint8) CLAMP((272 * r + 534 * g + 131 * b) / 1000, 0, 255);
+                guint8 newG = (guint8) CLAMP((349 * r + 686 * g + 168 * b) / 1000, 0, 255);
+                guint8 newR = (guint8) CLAMP((393 * r + 769 * g + 189 * b) / 1000, 0, 255);
+
+                pixel[0] = newR;
+                pixel[1] = newG;
+                pixel[2] = newB;
+            }
+        }
+
+        g_object_unref(originalPixbuf);
+        previewBoxWithImage->originalPixbuf = customPixbuf;
+        updatePreviewBox(previewBoxWithImage);
+    }
+}
+
+
 void applyVintageFilter(GtkWidget* button, gpointer imageFile) {
     PreviewBoxWithImage* previewBoxWithImage = imageFile;
 

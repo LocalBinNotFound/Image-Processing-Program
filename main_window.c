@@ -146,6 +146,7 @@ int main(int argc, char *argv[]) {
     GtkWidget *functionsAndPreviewBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
     GtkWidget *leftFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *rightFunctionBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_widget_set_size_request(rightFunctionBox, 300, 500);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
@@ -229,14 +230,14 @@ int main(int argc, char *argv[]) {
 
     // invert color
     GtkWidget *invertColorButton = gtk_button_new_with_label("Invert Color");
-    gtk_box_pack_start(GTK_BOX(leftFunctionBox), invertColorButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), invertColorButton, FALSE, FALSE, 0);
     g_signal_connect(invertColorButton, "clicked", G_CALLBACK(invertColor), previewBoxWithImage);
 
     // monochrome
     GtkWidget* monochromeBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* monochromeButton = gtk_button_new_with_label("Monochrome");
     gtk_box_pack_start(GTK_BOX(monochromeBox), monochromeButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(leftFunctionBox), monochromeBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), monochromeBox, FALSE, FALSE, 0);
     g_signal_connect(monochromeButton, "clicked", G_CALLBACK(turnIntoGrayscale), previewBoxWithImage);
 
     // vintage
@@ -245,6 +246,13 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(vintageBox), vintageButton, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(rightFunctionBox), vintageBox, FALSE, FALSE, 0);
     g_signal_connect(vintageButton, "clicked", G_CALLBACK(applyVintageFilter), previewBoxWithImage);
+
+    // old picture
+    GtkWidget* oldPicBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget* oldPicButton = gtk_button_new_with_label("Old Picture");
+    gtk_box_pack_start(GTK_BOX(oldPicBox), oldPicButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), oldPicBox, FALSE, FALSE, 0);
+    g_signal_connect(oldPicButton, "clicked", G_CALLBACK(oldPictureFilter), previewBoxWithImage);
 
     // sharpen
     GtkWidget* sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -260,7 +268,7 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(softenTitleBox), softenLabel, FALSE, FALSE, 0);
     gtk_box_set_homogeneous(GTK_BOX(softenTitleBox), TRUE);
     gtk_box_pack_start(GTK_BOX(softenBox), softenTitleBox, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), softenBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), softenBox, FALSE, FALSE, 0);
     GtkWidget* sigmaLabel = gtk_label_new("Sigma value:");
     GtkWidget* sigmaEntry = gtk_entry_new();
     previewBoxWithImage->sigmaEntry = sigmaEntry;

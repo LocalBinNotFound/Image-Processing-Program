@@ -18,6 +18,7 @@ void invertColor(GtkWidget *button, gpointer imageFile);
 void rotateLeft(GtkWidget* button, gpointer data);
 void rotateRight(GtkWidget* button, gpointer data);
 void applyVintageFilter(GtkWidget* button, gpointer imageFile);
+void oldPictureFilter(GtkWidget* button, gpointer imageFile);
 
 #endif // IMAGE_PROCESSING_PROGRAM_IMAGE_FUNCTIONS_H
 
