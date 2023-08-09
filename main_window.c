@@ -134,8 +134,8 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), leftFunctionBox, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), previewBoxWithBorder, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(functionsAndPreviewBox), rightFunctionBox, FALSE, FALSE, 0);
-    gtk_box_set_spacing(GTK_BOX(leftFunctionBox),40);
-    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),45);
+    gtk_box_set_spacing(GTK_BOX(leftFunctionBox),35);
+    gtk_box_set_spacing(GTK_BOX(rightFunctionBox),50);
 
     // logo
     gchar *currentFolder = g_path_get_dirname(__FILE__);
@@ -221,8 +221,15 @@ int main(int argc, char *argv[]) {
     GtkWidget* monochromeBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget* monochromeButton = gtk_button_new_with_label("Monochrome");
     gtk_box_pack_start(GTK_BOX(monochromeBox), monochromeButton, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(rightFunctionBox), monochromeBox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(leftFunctionBox), monochromeBox, FALSE, FALSE, 0);
     g_signal_connect(monochromeButton, "clicked", G_CALLBACK(turnIntoGrayscale), previewBoxWithImage);
+
+    // vintage
+    GtkWidget* vintageBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    GtkWidget* vintageButton = gtk_button_new_with_label("Vintage Effect");
+    gtk_box_pack_start(GTK_BOX(vintageBox), vintageButton, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(rightFunctionBox), vintageBox, FALSE, FALSE, 0);
+    g_signal_connect(vintageButton, "clicked", G_CALLBACK(applyVintageFilter), previewBoxWithImage);
 
     // sharpen
     GtkWidget* sharpenBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);

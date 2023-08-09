@@ -182,15 +182,20 @@ void gaussianBlur(GtkWidget* button, gpointer imageFile) {
                 gaussianKernel[i][j] /= sum;
             }
         }
-        for (int y = radius; y < height - radius; ++y) {
-            for (int x = radius; x < width - radius; ++x) {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
                 for (int c = 0; c < channels; ++c) {
                     double sum = 0.0;
                     for (int i = -radius; i <= radius; ++i) {
                         for (int j = -radius; j <= radius; ++j) {
-                            guint8* pixel = pixels + (y + i) * rowstride + (x + j) * channels + c;
-                            double value = *pixel * gaussianKernel[i + radius][j + radius];
-                            sum += value;
+                            int yIndex = y + i;
+                            int xIndex = x + j;
+                            // Handle padding by considering values outside the boundary as zero
+                            if (yIndex >= 0 && yIndex < height && xIndex >= 0 && xIndex < width) {
+                                guint8* pixel = pixels + yIndex * rowstride + xIndex * channels + c;
+                                double value = *pixel * gaussianKernel[i + radius][j + radius];
+                                sum += value;
+                            }
                         }
                     }
                     guint8* blurredPixel = pixels + y * rowstride + x * channels + c;
@@ -231,20 +236,26 @@ void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
                 kernel[i][j] /= kernelScaleDown;
             }
         }
+        int padding = 2;
 
-        for (int y = 2; y < height - 2; ++y) {
-            for (int x = 2; x < width - 2; ++x) {
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
                 for (int c = 0; c < channels; ++c) {
                     double sum = 0.0;
-                    for (int i = -2; i <= 2; ++i) {
-                        for (int j = -2; j <= 2; ++j) {
-                            guint8* pixel = pixels + (y + i) * rowstride + (x + j) * channels + c;
-                            double value = *pixel * kernel[i + 2][j + 2];
-                            sum += value;
+                    for (int i = -padding; i <= padding; ++i) {
+                        for (int j = -padding; j <= padding; ++j) {
+                            int neighborY = y + i;
+                            int neighborX = x + j;
+                            // Handle padding by considering values outside the boundary as zero
+                            guint8 neighborPixel = 0;
+                            if (neighborY >= 0 && neighborY < height &&
+                                neighborX >= 0 && neighborX < width) {
+                                neighborPixel = pixels[neighborY * rowstride + neighborX * channels + c];
+                            }
+
+                            sum += neighborPixel * kernel[i + padding][j + padding];
                         }
                     }
-                    if (sum < 0) sum = 0;
-                    if (sum > 255) sum = 255;
                     guint8* sharpenedPixel = pixels + y * rowstride + x * channels + c;
                     *sharpenedPixel = (guint8)CLAMP(sum, 0, 255);
                 }
@@ -255,6 +266,52 @@ void laplacianSharpen(GtkWidget* button, gpointer imageFile) {
         previewBoxWithImage->originalPixbuf = sharpenedPixbuf;
         updatePreviewBox(previewBoxWithImage);
     }
+}
+
+void applyVintageFilter(GtkWidget* button, gpointer imageFile) {
+    PreviewBoxWithImage* previewBoxWithImage = imageFile;
+
+    if (previewBoxWithImage == NULL || previewBoxWithImage->originalPixbuf == NULL) {
+        g_message("No image available to apply vintage filter!");
+        return;
+    }
+
+    GdkPixbuf* originalPixbuf = previewBoxWithImage->originalPixbuf;
+    GdkPixbuf* vintagePixbuf = gdk_pixbuf_copy(originalPixbuf);
+    int width = gdk_pixbuf_get_width(vintagePixbuf);
+    int height = gdk_pixbuf_get_height(vintagePixbuf);
+    int channels = gdk_pixbuf_get_n_channels(vintagePixbuf);
+    int rowstride = gdk_pixbuf_get_rowstride(vintagePixbuf);
+
+    guint8* pixels = gdk_pixbuf_get_pixels(vintagePixbuf);
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            guint8* pixel = pixels + y * rowstride + x * channels;
+            pixel[0] = (guint8)CLAMP(pixel[0] + 30, 0, 255);
+        }
+    }
+
+    double radius = MIN(width, height) / 2.0;
+    double centerX = width / 2.0;
+    double centerY = height / 2.0;
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            double distance = sqrt(pow(x - centerX, 2) + pow(y - centerY, 2));
+            double vignette = 1.0 - distance / radius;
+
+            if (vignette < 0.5) {
+                guint8* pixel = pixels + y * rowstride + x * channels;
+                for (int c = 0; c < channels; ++c) {
+                    pixel[c] = (guint8)CLAMP(pixel[c] * (vignette + 0.5), 0, 255);
+                }
+            }
+        }
+    }
+
+    g_object_unref(originalPixbuf);
+    previewBoxWithImage->originalPixbuf = vintagePixbuf;
+    updatePreviewBox(previewBoxWithImage);
 }
 
 
