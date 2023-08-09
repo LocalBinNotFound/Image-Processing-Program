@@ -1,10 +1,18 @@
+/* Code Bibliography:
+ * 1. "Reading and writing images with the stb_image libraries" by Paul (https://solarianprogrammer.com/2019/06/10/c-programming-reading-writing-images-stb_image-libraries/)
+ *      used to load and write images
+ *
+ * 2. GTK Tutorial by Georgia Institute of Technology (https://www.cc.gatech.edu/data_files/public/doc/gtk/tutorial/gtk_tut.html#toc10)
+ *      used to load/write files, create use of buttons
+*/
+
+
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
 #include <gtk/gtk.h>
 #include <stdbool.h>
 #include "stb/stb_image.h"
-#include "stb/stb_image_write.h"
 #include "function_buttons.h"
 
 GtkWidget* brightnessScale;
@@ -58,6 +66,7 @@ void updatePreviewBox(PreviewBoxWithImage *previewBoxWithImage) {
     }
 }
 
+// line 75 to 88 from reference 2
 void openButtonClicked(GtkWidget *button, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
     gint res;
@@ -116,6 +125,7 @@ void openButtonClicked(GtkWidget *button, gpointer imageFile) {
     gtk_widget_destroy(fileChooser);
 }
 
+// line 137 to 151 from reference 2
 void saveButtonClicked(GtkWidget *button, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
     GdkPixbuf *originalPixbuf = previewBoxWithImage->originalPixbuf;

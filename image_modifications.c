@@ -1,12 +1,21 @@
+/* Code Bibliography:
+ * 1. GTK Tutorial by Georgia Institute of Technology (https://www.cc.gatech.edu/data_files/public/doc/gtk/tutorial/gtk_tut.html#toc10)
+ *      used to load/write files, create use of buttons
+ *
+ * 2. "Changing the contrast and brightness of an image" by OpenCV (https://docs.opencv.org/3.4/d3/dc1/tutorial_basic_linear_transform.html)
+ *      used the concept to change brightness, contrast
+*/
+
+
+
 #include <gtk/gtk.h>
-#include "stb/stb_image.h"
-#include "stb/stb_image_write.h"
 #include "function_buttons.h"
 #include <math.h>
 
 const double minPixelValue = 0.0;
 const double maxPixelValue = 255.0;
 
+// used reference 2
 void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 
@@ -62,7 +71,7 @@ void adjustBrightness(GtkWidget* scale, gpointer imageFile) {
     }
 }
 
-
+// used reference 2
 void adjustContrast(GtkWidget* scale, gpointer imageFile) {
     PreviewBoxWithImage *previewBoxWithImage = imageFile;
 

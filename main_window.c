@@ -1,8 +1,22 @@
+/* Code Bibliography:
+ * 1. "Cairo Graphics Guide (11) - Images" by LiYanrui (http://liyanrui.is-programmer.com/posts/16682)
+ *      create cairo images in 2D
+ *
+ * 2. Gtk - 3.0 Library by GTK Development Team (https://docs.gtk.org/gtk3/index.html)
+ *      how to use gtk/gdk methods and attributes
+ *      all gtk methods are referenced here
+ *
+ * 3. Gtk Tutorial for C by GTK Development Team (https://docs.gtk.org/gtk3/getting_started.html)
+ *      how to start gtk and example methods
+*/
+
+
 #include <gtk/gtk.h>
 #include "function_buttons.h"
 #include "image_modifications.h"
 #include <cairo.h>
 
+// referenced from 1
 GtkWidget* createCircleButtons(int radius) {
     GtkWidget *button = gtk_button_new();
 
@@ -105,6 +119,7 @@ GtkWidget* boxWithBorder(GtkWidget* content) {
     return framedBox;
 }
 
+// line 124 to 132 referenced from  3
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
