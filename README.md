@@ -50,5 +50,7 @@ the nearest-neighbor technique.
     <img src="public/original.png" alt="Original" height="300" style="margin-right: 10px;" />
     <img src="public/blurred.png" alt="Blurred" height="300" style="margin-right: 10px;" />
     <img src="public/sharpen.png" alt="Sharpen" height="300" style="margin-right: 10px;" />
-    <img src="public/vintage.png" alt="Vintage" height="300" />
+    <img src="public/vintage.png" alt="Vintage" height="300" style="margin-right: 10px;"/>
+    <img src="public/monochrome.png" alt="Monochrome" height="300" style="margin-right: 10px;"/>
+    <img src="public/nostalgic.png" alt="Nostalgic" height="300" style="margin-right: 10px;"/>
 </div>
