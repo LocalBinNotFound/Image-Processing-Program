@@ -44,3 +44,9 @@ the nearest-neighbor technique.
   ```
   gcc main_window.c image_modifications.c function_buttons.c -o Image_Wicked `pkg-config --cflags --libs gtk+-3.0`
   ```
+
+## Demo
+<img src="public/original.png" alt="Original" height="300" />
+<img src="public/blurred.png" alt="Blurred" height="300" />
+<img src="public/sharpen.png" alt="Sharpen" height="300" />
+<img src="public/vintage.png" alt="Vintage" height="300" />
