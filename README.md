@@ -46,7 +46,9 @@ the nearest-neighbor technique.
   ```
 
 ## Demo
-<img src="public/original.png" alt="Original" height="300" />
-<img src="public/blurred.png" alt="Blurred" height="300" />
-<img src="public/sharpen.png" alt="Sharpen" height="300" />
-<img src="public/vintage.png" alt="Vintage" height="300" />
+<div style="display: flex; flex-wrap: wrap;">
+    <img src="public/original.png" alt="Original" height="300" style="margin-right: 10px;" />
+    <img src="public/blurred.png" alt="Blurred" height="300" style="margin-right: 10px;" />
+    <img src="public/sharpen.png" alt="Sharpen" height="300" style="margin-right: 10px;" />
+    <img src="public/vintage.png" alt="Vintage" height="300" />
+</div>
